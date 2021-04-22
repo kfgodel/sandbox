@@ -23,6 +23,11 @@ class ExampleTest : KotlinSpec() {
         log.info("Testing log fwk config")
         assertThat(testVariable()).isEqualTo(2)
       }
+
+      it("can be changed in another") {
+        testVariable { 3 }
+        assertThat(testVariable()).isEqualTo(3)
+      }
     }
   }
 }
