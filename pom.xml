@@ -40,6 +40,12 @@
 
   <dependencies>
 
+    <!-- Represent N-arity streams -->
+    <dependency>
+      <groupId>info.kfgodel</groupId>
+      <artifactId>nary</artifactId>
+      <version>3.0.0</version>
+    </dependency>
 
     <!-- Spec like tests -->
     <dependency>

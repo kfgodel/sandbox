@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
- * Example test for creatin others
+ * Example test for creating others
  * Date: 22/04/21 - 00:32
  */
 @RunWith(JavaSpecRunner::class)
