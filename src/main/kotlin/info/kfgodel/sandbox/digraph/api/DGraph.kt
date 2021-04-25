@@ -18,12 +18,14 @@ interface DGraph<N> {
     fun edges(): Stream<out DEdge<N>>
 
     /**
-     * Creates a new node on this graph that has the given object as its contents
+     * Creates (if not exists) a new node on this graph that has the given object as its contents.
+     * It returns the created Node or a previously created equal
      */
-    fun addNode(node: N): DGraph<N>
+    fun addNode(node: N): N
 
     /**
-     * Creates 2 new nodes from the source and target contents, and an edge that connects them
+     * Creates (if not exists) an edge with the given type connecting source to target.
+     * It return the created edge or a previously created equal (if already existed)
      */
-    fun addEdge(sourceNode: N, typeNode: N, targetNode: N): DGraph<N>
+    fun addEdge(sourceNode: N, typeNode: N, targetNode: N): DEdge<N>
 }
