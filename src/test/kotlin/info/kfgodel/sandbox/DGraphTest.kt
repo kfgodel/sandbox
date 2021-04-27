@@ -15,30 +15,30 @@ class DGraphTest : KotlinSpec() {
 
   override fun define() {
     describe("a DGraph") {
-      val grapqh by let { InMemoryGraph<String>() }
+      val graph by let { InMemoryGraph<String>() }
 
       it("is created without nodes or edges") {
-        assertThat(grapqh().nodes()).isEmpty()
-        assertThat(grapqh().edges()).isEmpty()
+        assertThat(graph().nodes()).isEmpty()
+        assertThat(graph().edges()).isEmpty()
       }
 
       describe("nodes") {
         it("are created from any object") {
           val anyObject = "example"
-          grapqh().addNode(anyObject)
-          assertThat(grapqh().nodes()).contains(anyObject)
+          graph().addNode(anyObject)
+          assertThat(graph().nodes()).contains(anyObject)
         }
 
         it("does not create duplicates based on object equality"){
           val content = CharArray(1) { _ -> 'a' }
           val firstObject = String(content)
           val secondObject = String(content)
-          grapqh().addNode(firstObject)
+          graph().addNode(firstObject)
 
-          val existingNode = grapqh().addNode(secondObject)
+          val existingNode = graph().addNode(secondObject)
 
           assertThat(existingNode).isSameAs(firstObject)
-          assertThat(grapqh().nodes()).hasSize(1)
+          assertThat(graph().nodes()).hasSize(1)
         }
       }
 
@@ -48,9 +48,9 @@ class DGraphTest : KotlinSpec() {
           val edgeType = "type"
           val targetNode = "target"
 
-          val createdEdge = grapqh().addEdge(sourceNode, edgeType, targetNode)
+          val createdEdge = graph().addEdge(sourceNode, edgeType, targetNode)
 
-          assertThat(grapqh().edges()).contains(createdEdge)
+          assertThat(graph().edges()).contains(createdEdge)
           assertThat(createdEdge.source).isSameAs(sourceNode)
           assertThat(createdEdge.type).isSameAs(edgeType)
           assertThat(createdEdge.target).isSameAs(targetNode)
@@ -60,16 +60,47 @@ class DGraphTest : KotlinSpec() {
           val sourceNode = "source"
           val edgeType = "type"
           val targetNode = "target"
-          grapqh().addEdge(sourceNode, edgeType, targetNode)
+          graph().addEdge(sourceNode, edgeType, targetNode)
 
-          assertThat(grapqh().nodes()).contains(sourceNode, edgeType, targetNode)
+          assertThat(graph().nodes()).contains(sourceNode, edgeType, targetNode)
         }
 
         it("does not create duplicates based on its nodes equality") {
-          val firstEdge = grapqh().addEdge("source", "type", "target")
-          val secondEdge = grapqh().addEdge("source", "type", "target")
+          val firstEdge = graph().addEdge("source", "type", "target")
+          val secondEdge = graph().addEdge("source", "type", "target")
           assertThat(firstEdge).isSameAs(secondEdge)
-          assertThat(grapqh().edges()).hasSize(1)
+          assertThat(graph().edges()).hasSize(1)
+        }
+      }
+
+      describe("equality") {
+        it("is defined by its contents (nodes and edges)") {
+          graph().addEdge("A","is","B")
+
+          val otherGraph = InMemoryGraph<String>()
+          otherGraph.addEdge("A","is","B")
+
+          assertThat(graph()).isEqualTo(otherGraph)
+          assertThat(graph()).isNotEqualTo(InMemoryGraph<String>())
+        }
+
+        it("differs if there is a difference in nodes") {
+          graph().addEdge("A","is","B")
+
+          val extraNodeGraph = InMemoryGraph<String>()
+          extraNodeGraph.addEdge("A","is", "B")
+          extraNodeGraph.addNode("D")
+
+          assertThat(graph()).isNotEqualTo(extraNodeGraph)
+        }
+
+        it("differs if there is a difference in edges") {
+          graph().addEdge("A","is","B")
+
+          val differentEdgeGraph = InMemoryGraph<String>()
+          differentEdgeGraph.addEdge("B","is", "A")
+
+          assertThat(graph()).isNotEqualTo(differentEdgeGraph)
         }
       }
     }

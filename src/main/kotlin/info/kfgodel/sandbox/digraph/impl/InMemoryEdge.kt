@@ -26,6 +26,6 @@ class InMemoryEdge<N>(override val source: N, override val type: N, override val
     }
 
     override fun toString(): String {
-        return "$source -$type-> $target"
+        return "$source -[$type]-> $target"
     }
 }
