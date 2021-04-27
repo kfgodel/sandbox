@@ -1,6 +1,6 @@
-package info.kfgodel.sandbox.digraph.api
+package info.kfgodel.sandbox.dgraph.api
 
-import java.util.stream.Stream
+import ar.com.kfgodel.nary.api.Nary
 
 /**
  * This type represents a directed graph (which is composed of nodes and directed edges connecting them)
@@ -10,12 +10,12 @@ interface DGraph {
     /**
      * Returns a stream with all the nodes belonging to this graph
      */
-    fun nodes(): Stream<out DNode>
+    fun nodes(): Nary<out DNode>
 
     /**
      * Returns a stream with all the nodes belonging to this graph
      */
-    fun edges(): Stream<out DEdge>
+    fun edges(): Nary<out DEdge>
 
     /**
      * Creates (if not exists) a new node on this graph that has the given object as its contents.
@@ -27,5 +27,5 @@ interface DGraph {
      * Creates (if not exists) an edge with the given type connecting source to target.
      * It return the created edge or a previously created equal (if already existed)
      */
-    fun crateEdge(source: DNode, type: DNode, target: DNode): DEdge
+    fun createEdge(source: DNode, type: DNode, target: DNode): DEdge
 }
