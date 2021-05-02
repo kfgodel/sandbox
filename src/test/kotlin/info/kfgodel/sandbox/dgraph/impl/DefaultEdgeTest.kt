@@ -14,7 +14,7 @@ class DefaultEdgeTest : KotlinSpec() {
     override fun define() {
         describe("a default edge") {
             val graph by let<DGraph>()
-            val edge by let { graph().createEdgeFrom("A", "B", "C") }
+            val edge by let { graph().getEdgeFrom("A", "B", "C") }
 
             describe("from a default graph and 3 nodes") {
                 graph { DefaultGraph() }
@@ -34,8 +34,8 @@ class DefaultEdgeTest : KotlinSpec() {
 
                 describe("equality"){
                     it("is based on its nodes and direction"){
-                        assertThat(edge()).isEqualTo(graph().createEdgeFrom("A","B","C"))
-                        assertThat(edge()).isNotEqualTo(graph().createEdgeFrom("C","B","A"))
+                        assertThat(edge()).isEqualTo(graph().getEdgeFrom("A","B","C"))
+                        assertThat(edge()).isNotEqualTo(graph().getEdgeFrom("C","B","A"))
                     }
                     it("only applies to instances of edges") {
                         // This is probably something that cannot be asserted, but I leave this to document the intention

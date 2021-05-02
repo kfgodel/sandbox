@@ -37,20 +37,27 @@ class DefaultGraphTest : KotlinSpec() {
       }
 
       describe("edge") {
-        it("is created to represent a directed link from one object to other, with an edge type defined by a third one") {
-          val createdEdge = graph().createEdgeFrom("A", " to ", "B")
+        it("is created to represent a directed link from one object to other, with an edge type defined by a third object") {
+          val createdEdge = graph().getEdgeFrom("A", " to ", "B")
           assertThat(graph().edges() as Stream<*>).contains(createdEdge)
         }
 
+        it("is reused when representing equal link") {
+          val firstEdge = graph().getEdgeFrom("A", " to ", "B")
+          val secondEdge = graph().getEdgeFrom("A", " to ", "B")
+          assertThat(firstEdge).isSameAs(secondEdge)
+          assertThat(graph().edges() as Stream<*>).hasSize(1)
+        }
+
         it("may implicitly create nodes for each linked object") {
-          val createdEdge = graph().createEdgeFrom("A", " to ", "B")
+          val createdEdge = graph().getEdgeFrom("A", " to ", "B")
           assertThat(graph().nodes() as Stream<*>).contains(createdEdge.source, createdEdge.type, createdEdge.target)
         }
       }
 
       it("has a string representation using the edges and unconnected nodes") {
-        graph().createEdgeFrom("A", "B", "C")
-        graph().createEdgeFrom("A", "B", "D")
+        graph().getEdgeFrom("A", "B", "C")
+        graph().getEdgeFrom("A", "B", "D")
         graph().getNodeFor("E")
 
         assertThat(graph().toString()).isEqualTo("{A-[B]->C,\n" +
@@ -59,19 +66,19 @@ class DefaultGraphTest : KotlinSpec() {
 
       describe("equality") {
         beforeEach {
-          graph().createEdgeFrom("A", "is", "B")
+          graph().getEdgeFrom("A", "is", "B")
         }
 
         it("is defined by its contents (nodes and edges)") {
           val otherGraph = DefaultGraph()
-          otherGraph.createEdgeFrom("A", "is", "B")
+          otherGraph.getEdgeFrom("A", "is", "B")
 
           assertThat(graph()).isEqualTo(otherGraph)
         }
 
         it("differs if nodes don't match") {
           val extraNodeGraph = DefaultGraph()
-          extraNodeGraph.createEdgeFrom("A", "is", "B")
+          extraNodeGraph.getEdgeFrom("A", "is", "B")
           extraNodeGraph.getNodeFor("extra node")
 
           assertThat(graph()).isNotEqualTo(extraNodeGraph)
@@ -79,7 +86,7 @@ class DefaultGraphTest : KotlinSpec() {
 
         it("differs if edges don't match") {
           val invertedGraph = DefaultGraph()
-          invertedGraph.createEdgeFrom("B", "is", "A")
+          invertedGraph.getEdgeFrom("B", "is", "A")
 
           assertThat(graph()).isNotEqualTo(invertedGraph)
         }

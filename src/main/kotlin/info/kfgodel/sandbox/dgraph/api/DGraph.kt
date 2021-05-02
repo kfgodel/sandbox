@@ -27,5 +27,5 @@ interface DGraph {
      * Creates (if not exists) an edge with the given type connecting source to target.
      * It return the created edge or a previously created equal (if already existed)
      */
-    fun createEdgeFrom(source: Any, type: Any, target: Any): DEdge
+    fun getEdgeFrom(source: Any, type: Any, target: Any): DEdge
 }

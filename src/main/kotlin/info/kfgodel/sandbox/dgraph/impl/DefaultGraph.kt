@@ -13,28 +13,26 @@ import java.util.stream.Collectors
 class DefaultGraph : DGraph {
 
     private val nodes = LinkedHashMap<Any, DNode>()
-    private val edges = ArrayList<DEdge>()
+    private val edges = LinkedHashMap<Triple<DNode, DNode, DNode>, DEdge>()
 
     override fun nodes(): Nary<out DNode> {
         return Nary.from(nodes.values)
     }
 
     override fun edges(): Nary<out DEdge> {
-        return Nary.from(edges)
+        return Nary.from(edges.values)
     }
 
     override fun getNodeFor(anObject: Any): DNode {
-        val node = nodes.computeIfAbsent(anObject) { id -> DefaultNode(id)}
+        val node = nodes.computeIfAbsent(anObject) { id -> DefaultNode(id) }
         return node
     }
 
-    override fun createEdgeFrom(source: Any, type: Any, target: Any): DEdge {
-        val sourceNode = getNodeFor(source)
-        val typeNode = getNodeFor(type)
-        val targetNode = getNodeFor(target)
-        val created = DefaultEdge(sourceNode, typeNode, targetNode)
-        edges.add(created)
-        return created
+    override fun getEdgeFrom(source: Any, type: Any, target: Any): DEdge {
+        val key = Triple(getNodeFor(source), getNodeFor(type), getNodeFor(target))
+        val edge =
+            edges.computeIfAbsent(key) { newKey -> DefaultEdge(newKey.first, newKey.second, newKey.third) }
+        return edge
     }
 
     override fun toString(): String {
@@ -43,16 +41,16 @@ class DefaultGraph : DGraph {
         val edges = edges().limit(10)
             .map { obj -> obj.toString() }
             .collect(Collectors.joining(",\n"))
-        if(edges.isNotEmpty()){
+        if (edges.isNotEmpty()) {
             builder.append(edges)
         }
 
-        val remainingNodes = nodes().filter {node ->  edges().noneMatch {edge -> edge.contains(node)}}
+        val remainingNodes = nodes().filter { node -> edges().noneMatch { edge -> edge.contains(node) } }
             .limit(10)
             .map { obj -> obj.toString() }
             .collect(Collectors.joining(", "))
-        if(remainingNodes.isNotEmpty()){
-            if(edges.isNotEmpty()){
+        if (remainingNodes.isNotEmpty()) {
+            if (edges.isNotEmpty()) {
                 builder.append(", ")
             }
             builder.append(remainingNodes)
