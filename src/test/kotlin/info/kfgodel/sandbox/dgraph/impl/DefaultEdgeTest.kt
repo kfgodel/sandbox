@@ -3,7 +3,6 @@ package info.kfgodel.sandbox.dgraph.impl
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import info.kfgodel.sandbox.dgraph.api.DGraph
-import info.kfgodel.sandbox.dgraph.api.DNode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.runner.RunWith
 
@@ -15,16 +14,13 @@ class DefaultEdgeTest : KotlinSpec() {
     override fun define() {
         describe("a default edge") {
             val graph by let<DGraph>()
-            val source by let<DNode>()
-            val type by let<DNode>()
-            val target by let<DNode>()
-            val edge by let { graph().createEdge(source(), type(), target()) }
+            val edge by let { graph().createEdgeFrom("A", "B", "C") }
 
             describe("from a default graph and 3 nodes") {
                 graph { DefaultGraph() }
-                source { graph().createNode().withId("source") }
-                type { graph().createNode().withId("type") }
-                target { graph().createNode().withId("target") }
+                val source by let { graph().getNodeFor("A") }
+                val type by let { graph().getNodeFor("B") }
+                val target by let { graph().getNodeFor("C") }
 
                 it("goes from a source node to a target node and has a type (defined by another node)") {
                     assertThat(edge().source).isSameAs(source())
@@ -32,16 +28,16 @@ class DefaultEdgeTest : KotlinSpec() {
                     assertThat(edge().target).isSameAs(target())
                 }
 
-                it("uses its nodes inside an arrow to represent its string") {
-                    assertThat(edge().toString()).isEqualTo("source -[type]-> target")
+                it("has a string representation like a typed arrow") {
+                    assertThat(edge().toString()).isEqualTo("A-[B]->C")
                 }
 
                 describe("equality"){
                     it("is based on its nodes and direction"){
-                        assertThat(edge()).isEqualTo(graph().createEdge(source(),type(),target()))
-                        assertThat(edge()).isNotEqualTo(graph().createEdge(target(),type(),source()))
+                        assertThat(edge()).isEqualTo(graph().createEdgeFrom("A","B","C"))
+                        assertThat(edge()).isNotEqualTo(graph().createEdgeFrom("C","B","A"))
                     }
-                    it("only applies to other edges") {
+                    it("only applies to instances of edges") {
                         // This is probably something that cannot be asserted, but I leave this to document the intention
                         assertThat(edge()).isNotEqualTo("source -[type]-> target")
                     }
@@ -54,7 +50,7 @@ class DefaultEdgeTest : KotlinSpec() {
                         assertThat(edge().contains(target())).isTrue()
                     }
                     it("no node that is not its source, target or type") {
-                        val unrelatedNode = graph().createNode()
+                        val unrelatedNode = graph().getNodeFor("Z")
                         assertThat(edge().contains(unrelatedNode)).isFalse()
                     }
                 }

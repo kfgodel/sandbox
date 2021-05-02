@@ -22,82 +22,68 @@ class DefaultGraphTest : KotlinSpec() {
         assertThat(graph().edges() as Stream<*>).isEmpty()
       }
 
-      describe("nodes") {
-        it("are created from the graph") {
-          val createdNode = graph().createNode()
+      describe("node") {
+        it("is created to represent an object in the graph") {
+          val createdNode = graph().getNodeFor("an object")
           assertThat(graph().nodes() as Stream<*>).contains(createdNode)
         }
-      }
 
-      describe("edges") {
-        it("are created from 3 nodes. Source, edge type and target nodes") {
-          val sourceNode = graph().createNode()
-          val edgeType = graph().createNode()
-          val targetNode = graph().createNode()
-
-          val createdEdge = graph().createEdge(sourceNode, edgeType, targetNode)
-
-          assertThat(graph().edges() as Stream<*>).contains(createdEdge)
+        it("is reused when representing equal objects") {
+          val firstNode = graph().getNodeFor(StringBuilder("a different object").toString())
+          val secondNode = graph().getNodeFor(StringBuilder("a different object").toString())
+          assertThat(firstNode).isSameAs(secondNode)
+          assertThat(graph().nodes() as Stream<*>).hasSize(1)
         }
       }
 
-      it("uses its edges for its string representation and adds any unconnected node") {
-        val nodeA = graph().createNode().withId("A")
-        val nodeB = graph().createNode().withId("B")
-        val nodeC = graph().createNode().withId("C")
-        val nodeD = graph().createNode().withId("D")
-        graph().createNode().withId("E")
+      describe("edge") {
+        it("is created to represent a directed link from one object to other, with an edge type defined by a third one") {
+          val createdEdge = graph().createEdgeFrom("A", " to ", "B")
+          assertThat(graph().edges() as Stream<*>).contains(createdEdge)
+        }
 
-        graph().createEdge(nodeA, nodeB, nodeC)
-        graph().createEdge(nodeA, nodeB, nodeD)
+        it("may implicitly create nodes for each linked object") {
+          val createdEdge = graph().createEdgeFrom("A", " to ", "B")
+          assertThat(graph().nodes() as Stream<*>).contains(createdEdge.source, createdEdge.type, createdEdge.target)
+        }
+      }
 
-        assertThat(graph().toString()).isEqualTo("{A -[B]-> C,\n" +
-                "A -[B]-> D, E}")
+      it("has a string representation using the edges and unconnected nodes") {
+        graph().createEdgeFrom("A", "B", "C")
+        graph().createEdgeFrom("A", "B", "D")
+        graph().getNodeFor("E")
+
+        assertThat(graph().toString()).isEqualTo("{A-[B]->C,\n" +
+                "A-[B]->D, E}")
       }
 
       describe("equality") {
         beforeEach {
-          val nodeA = graph().createNode().withId("A")
-          val nodeIs = graph().createNode().withId("is")
-          val nodeB = graph().createNode().withId("B")
-          graph().createEdge(nodeA, nodeIs, nodeB)
+          graph().createEdgeFrom("A", "is", "B")
         }
 
         it("is defined by its contents (nodes and edges)") {
-          // TODO: Reduce the verbosity required to populate the graph
           val otherGraph = DefaultGraph()
-          val nodeA = otherGraph.createNode().withId("A")
-          val nodeIs = otherGraph.createNode().withId("is")
-          val nodeB = otherGraph.createNode().withId("B")
-          otherGraph.createEdge(nodeA, nodeIs, nodeB)
+          otherGraph.createEdgeFrom("A", "is", "B")
 
           assertThat(graph()).isEqualTo(otherGraph)
         }
 
         it("differs if nodes don't match") {
           val extraNodeGraph = DefaultGraph()
-          val nodeA = extraNodeGraph.createNode().withId("A")
-          val nodeIs = extraNodeGraph.createNode().withId("is")
-          val nodeB = extraNodeGraph.createNode().withId("B")
-          extraNodeGraph.createEdge(nodeA, nodeIs, nodeB)
-          extraNodeGraph.createNode().withId("extra node")
+          extraNodeGraph.createEdgeFrom("A", "is", "B")
+          extraNodeGraph.getNodeFor("extra node")
 
           assertThat(graph()).isNotEqualTo(extraNodeGraph)
         }
 
         it("differs if edges don't match") {
           val invertedGraph = DefaultGraph()
-          val nodeB = invertedGraph.createNode().withId("B")
-          val nodeIs = invertedGraph.createNode().withId("is")
-          val nodeA = invertedGraph.createNode().withId("A")
-          invertedGraph.createEdge(nodeB, nodeIs, nodeA)
+          invertedGraph.createEdgeFrom("B", "is", "A")
 
           assertThat(graph()).isNotEqualTo(invertedGraph)
         }
       }
-
-
-
     }
   }
 }

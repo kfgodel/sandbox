@@ -12,25 +12,27 @@ import java.util.stream.Collectors
  */
 class DefaultGraph : DGraph {
 
-    private val nodes = ArrayList<DNode>()
+    private val nodes = LinkedHashMap<Any, DNode>()
     private val edges = ArrayList<DEdge>()
 
     override fun nodes(): Nary<out DNode> {
-        return Nary.from(nodes)
+        return Nary.from(nodes.values)
     }
 
     override fun edges(): Nary<out DEdge> {
         return Nary.from(edges)
     }
 
-    override fun createNode(): DNode {
-        val created = DefaultNode()
-        nodes.add(created)
-        return created
+    override fun getNodeFor(anObject: Any): DNode {
+        val node = nodes.computeIfAbsent(anObject) { id -> DefaultNode(id)}
+        return node
     }
 
-    override fun createEdge(source: DNode, type: DNode, target: DNode): DEdge {
-        val created = DefaultEdge(source, type, target)
+    override fun createEdgeFrom(source: Any, type: Any, target: Any): DEdge {
+        val sourceNode = getNodeFor(source)
+        val typeNode = getNodeFor(type)
+        val targetNode = getNodeFor(target)
+        val created = DefaultEdge(sourceNode, typeNode, targetNode)
         edges.add(created)
         return created
     }

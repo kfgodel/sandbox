@@ -12,9 +12,4 @@ interface DNode {
      */
     val id: Any
 
-    /**
-     * Replaces the id of this node with the given value
-     */
-    fun withId(newId: Any): DNode
-
 }

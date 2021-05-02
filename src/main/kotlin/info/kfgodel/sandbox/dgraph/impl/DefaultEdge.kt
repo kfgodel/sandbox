@@ -9,10 +9,8 @@ import info.kfgodel.sandbox.dgraph.api.DNode
  */
 class DefaultEdge(override val source: DNode, override val type: DNode, override val target: DNode) : DEdge {
 
-
-
     override fun toString(): String {
-        return "$source -[$type]-> $target"
+        return "$source-[$type]->$target"
     }
 
     override fun equals(other: Any?): Boolean {

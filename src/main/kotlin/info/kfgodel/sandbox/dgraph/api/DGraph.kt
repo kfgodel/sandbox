@@ -19,13 +19,13 @@ interface DGraph {
 
     /**
      * Creates (if not exists) a new node on this graph that has the given object as its contents.
-     * It returns the created Node or a previously created equal
+     * It returns the created Node or a previously created for an equal object
      */
-    fun createNode(): DNode
+    fun getNodeFor(anObject: Any): DNode
 
     /**
      * Creates (if not exists) an edge with the given type connecting source to target.
      * It return the created edge or a previously created equal (if already existed)
      */
-    fun createEdge(source: DNode, type: DNode, target: DNode): DEdge
+    fun createEdgeFrom(source: Any, type: Any, target: Any): DEdge
 }
