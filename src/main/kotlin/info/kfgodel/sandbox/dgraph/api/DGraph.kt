@@ -28,4 +28,10 @@ interface DGraph {
      * It return the created edge or a previously created equal (if already existed)
      */
     fun getEdgeFrom(source: Any, type: Any, target: Any): DEdge
+
+    /**
+     * Indicates if this graphs has any node or edge.
+     * True if it has no edge or nodes
+     */
+    fun isEmpty() : Boolean
 }

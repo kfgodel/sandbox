@@ -23,6 +23,10 @@ class DefaultGraph : DGraph {
         return Nary.from(edges.values)
     }
 
+    override fun isEmpty() : Boolean {
+        return nodes.isEmpty() && edges.isEmpty()
+    }
+
     override fun getNodeFor(anObject: Any): DNode {
         val node = nodes.computeIfAbsent(anObject) { id -> DefaultNode(id) }
         return node

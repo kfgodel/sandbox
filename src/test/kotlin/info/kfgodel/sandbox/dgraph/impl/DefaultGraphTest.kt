@@ -20,6 +20,7 @@ class DefaultGraphTest : KotlinSpec() {
       it("is created without nodes or edges") {
         assertThat(graph().nodes() as Stream<*>).isEmpty()
         assertThat(graph().edges() as Stream<*>).isEmpty()
+        assertThat(graph().isEmpty()).isTrue
       }
 
       describe("node") {

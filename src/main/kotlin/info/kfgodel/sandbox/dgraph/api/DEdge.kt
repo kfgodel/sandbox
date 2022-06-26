@@ -8,17 +8,17 @@ interface DEdge {
     /**
      * The object that this edge represents in the graph and can be used to reference this edge
      */
-    val type: Any
+    val type: DNode
 
     /**
      * The source node where this edge originates
      */
-    val source: Any
+    val source: DNode
 
     /**
      * The target node where this edge ends
      */
-    val target: Any
+    val target: DNode
 
     /**
      * Indicates if the given nodes is part of this edge. It needs to be the source, target or type of this instance
