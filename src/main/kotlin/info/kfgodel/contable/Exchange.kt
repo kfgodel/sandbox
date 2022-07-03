@@ -5,4 +5,7 @@ package info.kfgodel.contable
  * Date: 26/6/22 - 22:00
  */
 data class Exchange(val first: Magnitude, val second: Magnitude) {
+    override fun toString(): String {
+        return "$first x $second"
+    }
 }

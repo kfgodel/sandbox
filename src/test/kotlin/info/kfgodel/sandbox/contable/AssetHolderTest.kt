@@ -1,6 +1,8 @@
 package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.AssetHolder
+import info.kfgodel.contable.LOMBARD
+import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
 import info.kfgodel.contable.on
 import info.kfgodel.jspek.api.JavaSpecRunner
@@ -23,13 +25,13 @@ class AssetHolderTest : KotlinSpec() {
       }
 
       it("can acquire assets on a date for a price") {
-        holder().acquired(952.of("Lombard").at(998.99.of("USD")), on(8,5,2019))
-        assertThat(holder().assets()).containsExactly(952.of("Lombard"), (-998.99).of("USD"))
+        holder().acquired(952.of(LOMBARD).at(998.99.of(USD)), on(8,5,2019))
+        assertThat(holder().assets()).containsExactly(952.of(LOMBARD), (-998.99).of("USD"))
       }
 
       it("can sell assets on a date for a price") {
-        holder().sold(915.of("Lombard").at(976.75.of("USD")), on(27,12,2019))
-        assertThat(holder().assets()).containsExactly((-915).of("Lombard"), 976.75.of("USD"))
+        holder().sold(915.of(LOMBARD).at(976.75.of(USD)), on(27,12,2019))
+        assertThat(holder().assets()).containsExactly((-915).of(LOMBARD), 976.75.of("USD"))
       }
 
     }
