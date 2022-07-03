@@ -11,6 +11,7 @@ import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.runner.RunWith
+import java.io.File
 
 /**
  * Test for reader of lombard report
@@ -48,6 +49,11 @@ class LombardReaderTest : KotlinSpec() {
         )
       }
 
+      it("can read operations from a report file"){
+        val reportFile = File(this.javaClass.classLoader.getResource("lombard.txt").file)
+        reader().addReportFile(reportFile)
+        assertThat(reader().operations()).hasSize(20)
+      }
     }
   }
 }

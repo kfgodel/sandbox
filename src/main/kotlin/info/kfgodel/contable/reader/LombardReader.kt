@@ -8,7 +8,9 @@ import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
 import info.kfgodel.contable.operations.Operation
 import info.kfgodel.contable.operations.OperationType
+import java.io.File
 import java.math.BigDecimal
+import java.nio.file.Files
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -88,5 +90,10 @@ class LombardReader {
             "RESCATE" -> OperationType.SELL
             else -> throw IllegalArgumentException("Unexpected subscription type[${subscriptionType}]")
         }
+    }
+
+    fun addReportFile(reportFile: File) {
+        val reportContent = Files.readString(reportFile.toPath())
+        addReport(reportContent)
     }
 }
