@@ -33,10 +33,10 @@ class LedgerTest : KotlinSpec() {
       }
 
       describe("when valuating assets at a point in time") {
-        val valuation by let { ledger().valuation(on(31,12,2020))}
+        val valuation by let { ledger().valuation(on(31,12,2020), USD)}
 
         it("has no assets to value if it has no operations") {
-          assertThat(valuation().valuedAssets()).isEmpty()
+          assertThat(valuation().balances()).isEmpty()
         }
 
         describe("after a buy") {
@@ -44,18 +44,18 @@ class LedgerTest : KotlinSpec() {
             ledger().register(BUY.done(on(1,1,2020), 100.of(LOMBARD).at(100.of(USD))))
           }
           it("values an asset using its buy price") {
-            assertThat(valuation().valuedAssets()).hasSize(1)
+            assertThat(valuation().balances()).hasSize(1)
 
-            val valuedAsset = valuation().valuedAssets()[0]
+            val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo(100.of(LOMBARD))
             assertThat(valuedAsset.value()).isEqualTo(100.of(USD))
           }
 
           it("deducts a sell of same asset from the valuation") {
             ledger().register(SELL.done(on(2,1,2020), 50.of(LOMBARD).at(100.of(USD))))
-            assertThat(valuation().valuedAssets()).hasSize(1)
+            assertThat(valuation().balances()).hasSize(1)
 
-            val valuedAsset = valuation().valuedAssets()[0]
+            val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo(50.of(LOMBARD))
             assertThat(valuedAsset.value()).isEqualTo(50.of(USD))
           }
@@ -66,18 +66,18 @@ class LedgerTest : KotlinSpec() {
             }
 
             it("combines multiple buys into a single valuation") {
-              assertThat(valuation().valuedAssets()).hasSize(1)
+              assertThat(valuation().balances()).hasSize(1)
 
-              val valuedAsset = valuation().valuedAssets()[0]
+              val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo(150.of(LOMBARD))
               assertThat(valuedAsset.value()).isEqualTo(200.of(USD))
             }
 
             it("deducts a sell from the oldest buy") {
               ledger().register(SELL.done(on(3,1,2020), 50.of(LOMBARD).at(1000.of(USD))))
-              assertThat(valuation().valuedAssets()).hasSize(1)
+              assertThat(valuation().balances()).hasSize(1)
 
-              val valuedAsset = valuation().valuedAssets()[0]
+              val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo(100.of(LOMBARD))
               assertThat(valuedAsset.value()).isEqualTo(150.of(USD))
             }
@@ -89,18 +89,18 @@ class LedgerTest : KotlinSpec() {
             ledger().register(SELL.done(on(1,1,2020), 100.of(LOMBARD).at(100.of(USD))))
           }
           it("values an asset negatively as debt") {
-            assertThat(valuation().valuedAssets()).hasSize(1)
+            assertThat(valuation().balances()).hasSize(1)
 
-            val valuedAsset = valuation().valuedAssets()[0]
+            val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo((-100).of(LOMBARD))
             assertThat(valuedAsset.value()).isEqualTo((-100).of(USD))
           }
 
           it("reduces debt valuation when buying same asset") {
             ledger().register(BUY.done(on(2,1,2020), 50.of(LOMBARD).at(100.of(USD))))
-            assertThat(valuation().valuedAssets()).hasSize(1)
+            assertThat(valuation().balances()).hasSize(1)
 
-            val valuedAsset = valuation().valuedAssets()[0]
+            val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo((-50).of(LOMBARD))
             assertThat(valuedAsset.value()).isEqualTo((-50).of(USD))
           }
@@ -111,18 +111,18 @@ class LedgerTest : KotlinSpec() {
             }
 
             it("combines multiple sells into a single valuation") {
-              assertThat(valuation().valuedAssets()).hasSize(1)
+              assertThat(valuation().balances()).hasSize(1)
 
-              val valuedAsset = valuation().valuedAssets()[0]
+              val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo((-150).of(LOMBARD))
               assertThat(valuedAsset.value()).isEqualTo((-200).of(USD))
             }
 
             it("reduces debt from the oldest sell when buying") {
               ledger().register(BUY.done(on(3,1,2020), 50.of(LOMBARD).at(100.of(USD))))
-              assertThat(valuation().valuedAssets()).hasSize(1)
+              assertThat(valuation().balances()).hasSize(1)
 
-              val valuedAsset = valuation().valuedAssets()[0]
+              val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo((-100).of(LOMBARD))
               assertThat(valuedAsset.value()).isEqualTo((-150).of(USD))
             }

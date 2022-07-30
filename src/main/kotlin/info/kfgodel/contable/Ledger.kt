@@ -34,8 +34,8 @@ class Ledger {
         operations.computeIfAbsent(operation.moment) { _ -> mutableListOf() }.add(operation)
     }
 
-    fun valuation(referenceDate: LocalDateTime): PortfolioValuation {
-        val valuation = PortfolioValuation()
+    fun valuation(referenceDate: LocalDateTime, valueUnit: String): PortfolioValuation {
+        val valuation = PortfolioValuation(valueUnit)
         operationsBy(referenceDate).forEach { operation ->
             valuation.include(operation.valued())
         }

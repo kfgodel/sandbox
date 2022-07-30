@@ -24,4 +24,12 @@ data class Operation(val type: OperationType, val exchange: Exchange, val moment
     override fun value(): Magnitude {
         return type.applySignTo(exchange.second)
     }
+
+    override fun equals(other: Any?): Boolean {
+        return this.isEqualTo(other)
+    }
+
+    override fun hashCode(): Int {
+        return this.myHash()
+    }
 }

@@ -18,4 +18,11 @@ data class SimpleValuedAsset(private val asset: Magnitude, private val value: Ma
     override fun toString(): String {
         return "$asset = $value"
     }
+    override fun equals(other: Any?): Boolean {
+        return this.isEqualTo(other)
+    }
+
+    override fun hashCode(): Int {
+        return this.myHash()
+    }
 }
