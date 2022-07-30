@@ -12,7 +12,7 @@ import java.util.LinkedList
 class AssetBalance(val assetUnit:String, val valueUnit:String) {
     private val values: LinkedList<ValuedAsset> = LinkedList()
 
-    fun values(): LinkedList<ValuedAsset> {
+    fun valuables(): LinkedList<ValuedAsset> {
         return values
     }
 
