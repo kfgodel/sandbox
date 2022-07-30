@@ -23,7 +23,7 @@ import java.util.Locale
  * This class represents a reader of the lombard operation report that converts each line into an operation
  * Date: 2/7/22 - 22:27
  */
-class LombardReader {
+class PatagoniaReportReader {
     private val LINE_REGEX = """(\d\d/\d\d/\d\d\d\d) (RESCATE|SUSCRIPCION) (\d[\d.,]*) (\d+) (\d[\d.,]*) (.{1,3})""".toRegex()
     private val DECIMAL_FORMATTER = (NumberFormat.getInstance(Locale.GERMAN) as DecimalFormat)
         .also { formatter -> formatter.setParseBigDecimal(true) }
@@ -92,8 +92,9 @@ class LombardReader {
         }
     }
 
-    fun addReportFile(reportFile: File) {
+    fun addReportFile(reportFile: File): PatagoniaReportReader {
         val reportContent = Files.readString(reportFile.toPath())
         addReport(reportContent)
+        return this
     }
 }

@@ -1,6 +1,8 @@
 package info.kfgodel.contable
 
 import java.math.BigDecimal
+import java.math.MathContext
+import java.math.RoundingMode
 
 /**
  * This type represents a magnitude of a given unit
@@ -15,6 +17,11 @@ data class Magnitude(val amount: BigDecimal, val unit:String) {
 
     override fun toString(): String {
         return "$amount $unit"
+    }
+
+    companion object {
+        val ROUNDING = RoundingMode.HALF_EVEN
+        val MATH_CTX = MathContext(16, ROUNDING)
     }
 }
 
