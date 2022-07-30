@@ -59,6 +59,9 @@ class AssetBalanceTest : KotlinSpec() {
         it("updates value with  given amount") {
           assertThat(balance().value()).isEqualTo(200.of(USD))
         }
+        it("returns no consumed asset"){
+          assertThat(firstUpdate()).isEmpty()
+        }
 
         describe("when updated with a 2nd value that decreases balance") {
           val decreasedAmount by let<Number>()
@@ -77,6 +80,11 @@ class AssetBalanceTest : KotlinSpec() {
             it("reduces stored value with given amount"){
               assertThat(balance().valuables()).isEqualTo(listOf(90.of(LOMBARD).at(180.of(USD))))
             }
+            it("returns consumed asset from stored value equal to updated value"){
+              assertThat(secondUpdate()).isEqualTo(listOf(
+                10.of(LOMBARD).at(20.of(USD))
+              ))
+            }
           }
           describe("when second value is equal to current balance"){
             decreasedAmount.set { -100 }
@@ -89,6 +97,11 @@ class AssetBalanceTest : KotlinSpec() {
             it("removes stored value"){
               assertThat(balance().valuables()).isEmpty()
             }
+            it("returns current stored value"){
+              assertThat(secondUpdate()).isEqualTo(listOf(
+                100.of(LOMBARD).at(200.of(USD))
+              ))
+            }
           }
           describe("when second value is bigger than current balance"){
             decreasedAmount.set { -200 }
@@ -100,6 +113,11 @@ class AssetBalanceTest : KotlinSpec() {
             }
             it("replaces stored value with inverted signum remaining"){
               assertThat(balance().valuables()).isEqualTo(listOf((-100).of(LOMBARD).at(50.of(USD))))
+            }
+            it("returns current stored value"){
+              assertThat(secondUpdate()).isEqualTo(listOf(
+                100.of(LOMBARD).at(200.of(USD))
+              ))
             }
           }
         }
@@ -122,6 +140,10 @@ class AssetBalanceTest : KotlinSpec() {
               10.of(LOMBARD).at(50.of(USD))
             ))
           }
+          it("returns no consumed asset"){
+            assertThat(secondUpdate()).isEmpty()
+          }
+
 
           describe("but decreasing balance") {
             val decreasedAmount by let<Number>()
@@ -143,6 +165,11 @@ class AssetBalanceTest : KotlinSpec() {
                   10.of(LOMBARD).at(50.of(USD))
                 ))
               }
+              it("returns consumed asset from oldest value"){
+                assertThat(thirdUpdate()).isEqualTo(listOf(
+                  10.of(LOMBARD).at(20.of(USD))
+                ))
+              }
             }
             describe("when 3rd value is equal to oldest value"){
               decreasedAmount.set { -100 }
@@ -155,6 +182,11 @@ class AssetBalanceTest : KotlinSpec() {
               it("removes oldest stored value"){
                 assertThat(balance().valuables()).isEqualTo(listOf(
                   10.of(LOMBARD).at(50.of(USD))
+                ))
+              }
+              it("returns consumed oldest value"){
+                assertThat(thirdUpdate()).isEqualTo(listOf(
+                  100.of(LOMBARD).at(200.of(USD))
                 ))
               }
             }
@@ -171,7 +203,12 @@ class AssetBalanceTest : KotlinSpec() {
                   5.of(LOMBARD).at(25.of(USD))
                 ))
               }
-
+              it("returns consumed oldest value and portion of consumed 2nd value"){
+                assertThat(thirdUpdate()).isEqualTo(listOf(
+                  100.of(LOMBARD).at(200.of(USD)),
+                  5.of(LOMBARD).at(25.of(USD))
+                ))
+              }
             }
             describe("when 3rd value is bigger than previous values"){
               decreasedAmount.set { -200 }
@@ -183,6 +220,12 @@ class AssetBalanceTest : KotlinSpec() {
               }
               it("replaces stored value with inverted signum remaining"){
                 assertThat(balance().valuables()).isEqualTo(listOf((-90).of(LOMBARD).at(45.of(USD))))
+              }
+              it("returns consumed previous values"){
+                assertThat(thirdUpdate()).isEqualTo(listOf(
+                  100.of(LOMBARD).at(200.of(USD)),
+                  10.of(LOMBARD).at(50.of(USD))
+                ))
               }
             }
           }
