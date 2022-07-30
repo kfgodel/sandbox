@@ -2,7 +2,6 @@ package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.Magnitude
 import info.kfgodel.contable.of
-import java.math.BigDecimal
 import java.util.LinkedList
 
 /**
@@ -35,41 +34,36 @@ class AssetBalance(val assetUnit:String, val valueUnit:String) {
             .reduce(Magnitude::sum)
     }
 
-    fun updateWith(valued: ValuedAsset) {
-        validateUpdatedAsset(valued)
-        var amountToUpdate = valued.asset().amount
-        while (!values.isEmpty()){
+    fun updateWith(latest: ValuedAsset) {
+        validateUpdatedAsset(latest)
+        var latestAsset = latest.asset()
+        while (!latestAsset.isZero() && !values.isEmpty()){ // While we have an amount to update and values to consume
             val oldest = values.removeFirst()
-            val oldestAvailable = oldest.asset().amount
-            if(oldestAvailable.signum() == amountToUpdate.signum()){
-                // It's an increase of assets amount (either positive or negative increase). We keep both
-                values.addFirst(oldest)
-                values.addLast(valued)
-                amountToUpdate = BigDecimal.ZERO
-                break
-            }
-            // It's a reduction of asset, we need to update remaining amounts
-            val oldestRemaining = oldestAvailable.add(amountToUpdate)
-            if(oldestRemaining.signum() == 0){
-                // We used all the available asset with the oldest value. Nothing else to do
-                amountToUpdate = BigDecimal.ZERO
-                break
-            }else if(oldestRemaining.signum() == oldestAvailable.signum()){
-                // There's still some remaining asset from the oldest
-                val valuedRemaining = oldest.proportionalTo(oldestRemaining)
-                values.addFirst(valuedRemaining)
-                amountToUpdate = BigDecimal.ZERO
-                break
-            }else {
-                // We used all the available from oldest but there's still more to reduce
-                amountToUpdate = oldestRemaining
+            val oldestAsset = oldest.asset()
+            val remainingAsset = oldestAsset.sum(latestAsset)
+            if(remainingAsset.hasSameSignumAs(oldestAsset)){
+                // We didn't consume all the oldest asset
+                if(remainingAsset.isBiggerThan(oldestAsset)){
+                    // It's an increase of assets not a consumption. We keep both
+                    values.addFirst(oldest)
+                    values.addLast(latest)
+                }else{
+                    // We keep only what wasn't consumed from the oldest
+                    val updatedOldest = oldest.proportionalTo(remainingAsset.amount)
+                    values.addFirst(updatedOldest)
+                }
+                latestAsset = 0.of(assetUnit)
+            }else{
+                // We consumed all the oldest asset, but there's still more to be updated
+                latestAsset = remainingAsset
             }
         }
-        if(amountToUpdate.signum() != 0){
-            // There are no remaining values but we still have an amount to update. This changes balance signum
-            var newValue = valued
-            if(!amountToUpdate.equals(valued.asset().amount)){
-                newValue = valued.proportionalTo(amountToUpdate)
+        if(!latestAsset.isZero()){
+            // We still have an amount to update after consuming all pre-existing values. This changes balance signum
+            val newValue = if (latestAsset == latest.asset()) {
+                latest
+            } else {
+                latest.proportionalTo(latestAsset.amount)
             }
             values.addFirst(newValue)
         }

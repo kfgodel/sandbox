@@ -10,13 +10,13 @@ import java.time.LocalDateTime
  */
 enum class OperationType {
     BUY {
-        override fun gainedIn(exchange: Exchange): Magnitude = exchange.first
-        override fun lostIn(exchange: Exchange): Magnitude = exchange.second
+        override fun gainedIn(exchange: Exchange): Magnitude = exchange.asset
+        override fun lostIn(exchange: Exchange): Magnitude = exchange.price
         override fun applySignTo(magnitude: Magnitude): Magnitude = magnitude
     },
     SELL {
-        override fun gainedIn(exchange: Exchange): Magnitude = exchange.second
-        override fun lostIn(exchange: Exchange): Magnitude = exchange.first
+        override fun gainedIn(exchange: Exchange): Magnitude = exchange.price
+        override fun lostIn(exchange: Exchange): Magnitude = exchange.asset
         override fun applySignTo(magnitude: Magnitude): Magnitude = magnitude.negative()
     };
 

@@ -19,6 +19,18 @@ data class Magnitude(val amount: BigDecimal, val unit:String) {
         return "$amount $unit"
     }
 
+    fun hasSameSignumAs(other: Magnitude): Boolean {
+        return this.amount.signum() == other.amount.signum()
+    }
+
+    fun isZero(): Boolean {
+        return this.amount.signum() == 0 // Fastest way to check for 0 with BigDecimals
+    }
+
+    fun isBiggerThan(other: Magnitude): Boolean {
+        return this.amount.abs() > other.amount.abs()
+    }
+
     companion object {
         val ROUNDING = RoundingMode.HALF_EVEN
         val MATH_CTX = MathContext(16, ROUNDING)

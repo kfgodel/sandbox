@@ -12,9 +12,10 @@ import java.util.Objects
 interface ValuedAsset{
     fun asset(): Magnitude
     fun value(): Magnitude
-    fun proportionalTo(remaining: BigDecimal): ValuedAsset {
-     val proportionalValue = remaining.multiply(value().amount).divide(asset().amount, Magnitude.MATH_CTX)
-     return SimpleValuedAsset(remaining.of(asset().unit), proportionalValue.of(value().unit))
+    fun proportionalTo(fraction: BigDecimal): ValuedAsset {
+        val assetAmount = this.asset().amount
+        val proportionalValue = fraction.multiply(value().amount).divide(assetAmount, Magnitude.MATH_CTX)
+        return SimpleValuedAsset(fraction.of(asset().unit), proportionalValue.of(value().unit))
     }
     fun isEqualTo(other: Any?): Boolean{
         if (other !is ValuedAsset){
