@@ -1,7 +1,6 @@
 package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.Magnitude
-import info.kfgodel.contable.of
 import java.math.BigDecimal
 import java.util.Objects
 
@@ -13,9 +12,7 @@ interface ValuedAsset{
     fun asset(): Magnitude
     fun value(): Magnitude
     fun proportionalTo(fraction: BigDecimal): ValuedAsset {
-        val assetAmount = this.asset().amount
-        val proportionalValue = fraction.multiply(value().amount).divide(assetAmount, Magnitude.MATH_CTX)
-        return SimpleValuedAsset(fraction.of(asset().unit), proportionalValue.of(value().unit))
+        return FractionalValuedAsset(fraction, this)
     }
     fun isEqualTo(other: Any?): Boolean{
         if (other !is ValuedAsset){
