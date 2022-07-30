@@ -56,10 +56,10 @@ class AssetBalanceTest : KotlinSpec() {
         it("updates asset with given amount") {
           assertThat(balance().asset()).isEqualTo(100.of(LOMBARD))
         }
-        it("updates value with  given amount") {
+        it("updates value with given amount") {
           assertThat(balance().value()).isEqualTo(200.of(USD))
         }
-        it("returns no consumed asset"){
+        it("returns no consumed valuable"){
           assertThat(firstUpdate()).isEmpty()
         }
 
@@ -77,10 +77,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("updates value proportional to remaining assets") {
               assertThat(balance().value()).isEqualTo(180.of(USD))
             }
-            it("reduces stored value with given amount"){
+            it("reduces stored valuables with given amount"){
               assertThat(balance().valuables()).isEqualTo(listOf(90.of(LOMBARD).at(180.of(USD))))
             }
-            it("returns consumed asset from stored value equal to updated value"){
+            it("returns partially consumed valuable equal to updated value"){
               assertThat(secondUpdate()).isEqualTo(listOf(
                 10.of(LOMBARD).at(20.of(USD))
               ))
@@ -94,10 +94,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("updates value to 0") {
               assertThat(balance().value()).isEqualTo(0.of(USD))
             }
-            it("removes stored value"){
+            it("removes stored valuable"){
               assertThat(balance().valuables()).isEmpty()
             }
-            it("returns current stored value"){
+            it("returns consumed valuable"){
               assertThat(secondUpdate()).isEqualTo(listOf(
                 100.of(LOMBARD).at(200.of(USD))
               ))
@@ -111,10 +111,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("updates value proportional to remaining asset value") {
               assertThat(balance().value()).isEqualTo(50.of(USD))
             }
-            it("replaces stored value with inverted signum remaining"){
+            it("replaces valuables with remaining from difference"){
               assertThat(balance().valuables()).isEqualTo(listOf((-100).of(LOMBARD).at(50.of(USD))))
             }
-            it("returns current stored value"){
+            it("returns consumed valuable from previous balance"){
               assertThat(secondUpdate()).isEqualTo(listOf(
                 100.of(LOMBARD).at(200.of(USD))
               ))
@@ -134,7 +134,7 @@ class AssetBalanceTest : KotlinSpec() {
           it("updates value with adding given amount") {
             assertThat(balance().value()).isEqualTo(250.of(USD))
           }
-          it("stores the additional value"){
+          it("stores the additional valuable"){
             assertThat(balance().valuables()).isEqualTo(listOf(
               100.of(LOMBARD).at(200.of(USD)),
               10.of(LOMBARD).at(50.of(USD))
@@ -159,13 +159,13 @@ class AssetBalanceTest : KotlinSpec() {
               it("reduces value proportionally from oldest asset") {
                 assertThat(balance().value()).isEqualTo(230.of(USD))
               }
-              it("reduces oldest stored value with given amount"){
+              it("reduces oldest stored valuable with given amount"){
                 assertThat(balance().valuables()).isEqualTo(listOf(
                   90.of(LOMBARD).at(180.of(USD)),
                   10.of(LOMBARD).at(50.of(USD))
                 ))
               }
-              it("returns consumed asset from oldest value"){
+              it("returns consumed asset from oldest valuable"){
                 assertThat(thirdUpdate()).isEqualTo(listOf(
                   10.of(LOMBARD).at(20.of(USD))
                 ))
@@ -179,12 +179,12 @@ class AssetBalanceTest : KotlinSpec() {
               it("keeps value from 2nd value") {
                 assertThat(balance().value()).isEqualTo(50.of(USD))
               }
-              it("removes oldest stored value"){
+              it("removes oldest stored valuable"){
                 assertThat(balance().valuables()).isEqualTo(listOf(
                   10.of(LOMBARD).at(50.of(USD))
                 ))
               }
-              it("returns consumed oldest value"){
+              it("returns consumed oldest valuable"){
                 assertThat(thirdUpdate()).isEqualTo(listOf(
                   100.of(LOMBARD).at(200.of(USD))
                 ))
@@ -198,12 +198,12 @@ class AssetBalanceTest : KotlinSpec() {
               it("reduces value proportionally from 2nd asset") {
                 assertThat(balance().value()).isEqualTo(25.of(USD))
               }
-              it("removes 1st value and only keeps a portion of 2nd"){
+              it("removes 1st valuable and only keeps a portion of 2nd"){
                 assertThat(balance().valuables()).isEqualTo(listOf(
                   5.of(LOMBARD).at(25.of(USD))
                 ))
               }
-              it("returns consumed oldest value and portion of consumed 2nd value"){
+              it("returns consumed oldest valuable and portion of consumed 2nd valuable"){
                 assertThat(thirdUpdate()).isEqualTo(listOf(
                   100.of(LOMBARD).at(200.of(USD)),
                   5.of(LOMBARD).at(25.of(USD))
@@ -218,10 +218,10 @@ class AssetBalanceTest : KotlinSpec() {
               it("updates value proportional to remaining asset value") {
                 assertThat(balance().value()).isEqualTo(45.of(USD))
               }
-              it("replaces stored value with inverted signum remaining"){
+              it("replaces valuables with remaining from difference"){
                 assertThat(balance().valuables()).isEqualTo(listOf((-90).of(LOMBARD).at(45.of(USD))))
               }
-              it("returns consumed previous values"){
+              it("returns all consumed valuables"){
                 assertThat(thirdUpdate()).isEqualTo(listOf(
                   100.of(LOMBARD).at(200.of(USD)),
                   10.of(LOMBARD).at(50.of(USD))
