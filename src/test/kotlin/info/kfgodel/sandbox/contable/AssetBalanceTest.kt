@@ -59,7 +59,7 @@ class AssetBalanceTest : KotlinSpec() {
           assertThat(balance().value()).isEqualTo(200.of(USD))
         }
 
-        describe("when updated with a second value that decreases balance") {
+        describe("when updated with a 2nd value that decreases balance") {
           describe("when second value is smaller than current balance") {
             beforeEach {
               balance().updateWith((-10).of(LOMBARD).at(100.of(USD)))
@@ -104,7 +104,7 @@ class AssetBalanceTest : KotlinSpec() {
           }
         }
 
-        describe("when updated with a second value that increases balance") {
+        describe("when updated with a 2nd value that increases balance") {
           beforeEach {
             balance().updateWith(10.of(LOMBARD).at(50.of(USD)))
           }
@@ -121,8 +121,74 @@ class AssetBalanceTest : KotlinSpec() {
               10.of(LOMBARD).at(50.of(USD))
             ))
           }
-        }
 
+          describe("but decreasing balance") {
+            describe("when 3rd value is smaller than oldest value") {
+              beforeEach {
+                balance().updateWith((-10).of(LOMBARD).at(100.of(USD)))
+              }
+              it("reduces asset by given amount from oldest value") {
+                assertThat(balance().asset()).isEqualTo(100.of(LOMBARD))
+              }
+              it("reduces value proportionally from oldest asset") {
+                assertThat(balance().value()).isEqualTo(230.of(USD))
+              }
+              it("reduces oldest stored value with given amount"){
+                assertThat(balance().values()).isEqualTo(listOf(
+                  90.of(LOMBARD).at(180.of(USD)),
+                  10.of(LOMBARD).at(50.of(USD))
+                ))
+              }
+            }
+            describe("when 3rd value is equal to oldest value"){
+              beforeEach {
+                balance().updateWith((-100).of(LOMBARD).at(100.of(USD)))
+              }
+              it("keeps assets from 2nd value") {
+                assertThat(balance().asset()).isEqualTo(10.of(LOMBARD))
+              }
+              it("keeps value from 2nd value") {
+                assertThat(balance().value()).isEqualTo(50.of(USD))
+              }
+              it("removes oldest stored value"){
+                assertThat(balance().values()).isEqualTo(listOf(
+                  10.of(LOMBARD).at(50.of(USD))
+                ))
+              }
+            }
+            describe("when 3rd value is bigger than oldest value but smaller than 2nd"){
+              beforeEach {
+                balance().updateWith((-105).of(LOMBARD).at(100.of(USD)))
+              }
+              it("reduces asset by given amount also from 2nd value") {
+                assertThat(balance().asset()).isEqualTo(5.of(LOMBARD))
+              }
+              it("reduces value proportionally from 2nd asset") {
+                assertThat(balance().value()).isEqualTo(25.of(USD))
+              }
+              it("removes 1st value and only keeps a portion of 2nd"){
+                assertThat(balance().values()).isEqualTo(listOf(
+                  5.of(LOMBARD).at(25.of(USD))
+                ))
+              }
+
+            }
+            describe("when 3rd value is bigger than previous values"){
+              beforeEach {
+                balance().updateWith((-200).of(LOMBARD).at(100.of(USD)))
+              }
+              it("inverts balance signum with remaining asset amount") {
+                assertThat(balance().asset()).isEqualTo((-90).of(LOMBARD))
+              }
+              it("updates value proportional to remaining asset value") {
+                assertThat(balance().value()).isEqualTo(45.of(USD))
+              }
+              it("replaces stored value with inverted signum remaining"){
+                assertThat(balance().values()).isEqualTo(listOf((-90).of(LOMBARD).at(45.of(USD))))
+              }
+            }
+          }
+        }
       }
     }
   }
