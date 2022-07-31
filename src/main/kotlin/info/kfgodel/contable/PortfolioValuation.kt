@@ -17,6 +17,7 @@ class PortfolioValuation(val valueUnit: String) {
     }
 
     fun include(valued: ValuedAsset) {
+        validate(valued)
         val includedAssetUnit = valued.asset().unit
         val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
             AssetBalance(
@@ -25,6 +26,13 @@ class PortfolioValuation(val valueUnit: String) {
             )
         }
         assetBalance.updateWith(valued)
+    }
+
+    private fun validate(valued: ValuedAsset) {
+        val newUnit = valued.value().unit
+        if(newUnit != valueUnit){
+            throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]")
+        }
     }
 
 }

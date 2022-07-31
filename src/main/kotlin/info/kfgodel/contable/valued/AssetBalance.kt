@@ -9,14 +9,14 @@ import java.util.LinkedList
  *
  * Date: 30/7/22 - 14:35
  */
-class AssetBalance(val assetUnit:String, val valueUnit:String) {
+class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
     private val values: LinkedList<ValuedAsset> = LinkedList()
 
     fun valuables(): LinkedList<ValuedAsset> {
         return values
     }
 
-    fun asset(): Magnitude {
+    override fun asset(): Magnitude {
         if(values.isEmpty()){
             return 0.of(assetUnit)
         }
@@ -25,7 +25,7 @@ class AssetBalance(val assetUnit:String, val valueUnit:String) {
             .reduce(Magnitude::sum)
     }
 
-    fun value(): Magnitude {
+    override fun value(): Magnitude {
         if(values.isEmpty()){
             return 0.of(valueUnit)
         }
@@ -85,5 +85,18 @@ class AssetBalance(val assetUnit:String, val valueUnit:String) {
             throw UnsupportedOperationException("Update using a different value[${updatedValueUnit}] than expected[${valueUnit}]")
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        return this.isEqualTo(other)
+    }
+
+    override fun hashCode(): Int {
+        return this.myHash()
+    }
+
+    override fun toString(): String {
+        return "${asset()} = ${value()} from ${values.size} values"
+    }
+
 
 }
