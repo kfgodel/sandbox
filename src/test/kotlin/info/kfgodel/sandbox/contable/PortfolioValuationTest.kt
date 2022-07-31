@@ -4,6 +4,7 @@ import info.kfgodel.contable.LOMBARD
 import info.kfgodel.contable.PortfolioValuation
 import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
+import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -23,6 +24,10 @@ class PortfolioValuationTest : KotlinSpec() {
         assertThat(valuation().balances()).isEmpty()
       }
 
+      it("starts with no profit or losses"){
+        assertThat(valuation().profitAndLosses()).isEmpty()
+      }
+
       itThrows(UnsupportedOperationException::class.java, "if a value with different unit is included",{
         valuation().include(1.of("ANY").at(1.of("ARS")))
       }, { e ->
@@ -32,28 +37,66 @@ class PortfolioValuationTest : KotlinSpec() {
       describe("when values are included") {
         beforeEach {
           valuation().include(100.of(LOMBARD).at(100.of(USD)))
-          valuation().include(100.of(LOMBARD).at(50.of(USD)))
+          valuation().include(100.of(LOMBARD).at(200.of(USD)))
           valuation().include(10.of("OTHER").at(10.of(USD)))
         }
-        it("has a balance per each asset") {
-          assertThat(valuation().balances()).isEqualTo(listOf(
-            200.of(LOMBARD).at(150.of(USD)),
-            10.of("OTHER").at(10.of(USD))
-          ))
+
+        describe("balances") {
+
+          it("are calculated per each asset") {
+            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+              200.of(LOMBARD).at(300.of(USD)),
+              10.of("OTHER").at(10.of(USD))
+            ))
+          }
+
+          it("are updated as new values are included"){
+            valuation().include((-150).of(LOMBARD).at(100.of(USD)))
+            valuation().include(10.of("OTHER").at(50.of(USD)))
+            valuation().include((-10).of("OTHER").at(50.of(USD)))
+
+            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+              50.of(LOMBARD).at(100.of(USD)),
+              10.of("OTHER").at(50.of(USD))
+            ))
+          }
         }
 
-        it("updates each balance as new values are included"){
-          valuation().include((-150).of(LOMBARD).at(100.of(USD)))
-          valuation().include(10.of("OTHER").at(50.of(USD)))
-          valuation().include((-10).of("OTHER").at(50.of(USD)))
+        describe("P&L") {
+          it("does not change until an asset is reduced"){
+            assertThat(valuation().profitAndLosses()).isEmpty()
+          }
 
-          assertThat(valuation().balances()).isEqualTo(listOf(
-            50.of(LOMBARD).at(25.of(USD)),
-            10.of("OTHER").at(50.of(USD))
-          ))
+          it("does not change if asset is reduced at original price"){
+            valuation().include((-50).of(LOMBARD).at(50.of(USD)))
+            valuation().include((-5).of("OTHER").at(5.of(USD)))
+            assertThat(valuation().profitAndLosses()).isEmpty()
+          }
+
+          it("generates losses when reducing asset for a worse price"){
+            valuation().include((-150).of(LOMBARD).at(75.of(USD)))
+            assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              100.of(LOMBARD).at((-50).of(USD)),
+              50.of(LOMBARD).at((-75).of(USD))
+            ))
+          }
+
+          it("generates profit when reducing asset for a better price"){
+            valuation().include((-150).of(LOMBARD).at(300.of(USD)))
+            assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              100.of(LOMBARD).at(100.of(USD))
+            ))
+          }
+
+          it("generates profit and losses when price is better and worse than previous values"){
+            valuation().include((-150).of(LOMBARD).at(200.of(USD)))
+            assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              100.of(LOMBARD).at(33.33.of(USD)),
+              50.of(LOMBARD).at((-33.33).of(USD))
+            ))
+          }
         }
       }
-
     }
   }
 }

@@ -1,6 +1,7 @@
 package info.kfgodel.contable
 
 import info.kfgodel.contable.valued.AssetBalance
+import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.ValuedAsset
 import java.util.TreeMap
 
@@ -11,21 +12,34 @@ import java.util.TreeMap
 class PortfolioValuation(val valueUnit: String) {
 
     private val valuesPerAssetUnit = TreeMap<String, AssetBalance>()
+    private val profitAndLosses = mutableListOf<ValueChange>()
 
     fun balances(): List<AssetBalance> {
         return valuesPerAssetUnit.values.toList()
     }
 
-    fun include(valued: ValuedAsset) {
-        validate(valued)
-        val includedAssetUnit = valued.asset().unit
+    fun include(included: ValuedAsset) {
+        validate(included)
+        val includedAssetUnit = included.asset().unit
         val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
             AssetBalance(
                 assetUnit,
                 valueUnit
             )
         }
-        assetBalance.updateWith(valued)
+        val reduced = assetBalance.updateWith(included)
+        considerProfitAndLossesDueTo(reduced, included)
+    }
+
+    private fun considerProfitAndLossesDueTo(removed: List<ValuedAsset>, replacement: ValuedAsset) {
+        removed.forEach { previous ->
+            val change = ValueChange(previous, replacement)
+            if (change.isZero()) {
+                // Nor profit or loss
+            } else {
+                profitAndLosses.add(change)
+            }
+        }
     }
 
     private fun validate(valued: ValuedAsset) {
@@ -33,6 +47,10 @@ class PortfolioValuation(val valueUnit: String) {
         if(newUnit != valueUnit){
             throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]")
         }
+    }
+
+    fun profitAndLosses(): List<ValuedAsset> {
+        return profitAndLosses
     }
 
 }
