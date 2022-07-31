@@ -1,5 +1,6 @@
 package info.kfgodel.contable
 
+import info.kfgodel.contable.operations.Operation
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.ValuedAsset
@@ -46,6 +47,14 @@ class PortfolioValuation(val valueUnit: String) {
 
     fun profitAndLosses(): List<ValuedAsset> {
         return profitAndLosses
+    }
+
+    fun removeProfitAndLosses() {
+        this.profitAndLosses.clear()
+    }
+
+    fun includeAll(operations: Iterable<Operation>) {
+        operations.forEach(this::include)
     }
 
 }

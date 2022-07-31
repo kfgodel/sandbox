@@ -9,17 +9,26 @@ import info.kfgodel.contable.operations.Operation
  */
 class AccountantReport(private val ledger: Ledger, val year: Int, private val valueUnit: String) {
     fun operations(): List<Operation> {
-        return ledger.operations()
-            .filter { operation -> operation.moment.year == year }
+        return operationsMatching { operation -> operation.moment.year == year }
     }
 
     fun valuationAtStart(): PortfolioValuation {
-        return PortfolioValuation(valueUnit)
+        val valuation = PortfolioValuation(valueUnit)
+        valuation.includeAll(operationsMatching(beforeThisYear()))
+        return valuation
     }
 
     fun valuationAtEnd(): PortfolioValuation {
-        val valuation = PortfolioValuation(valueUnit)
-        operations().forEach(valuation::include)
+        val valuation = valuationAtStart()
+        valuation.removeProfitAndLosses() // We don't care about previous P&G, only the ones on this year
+        valuation.includeAll(operationsMatching(fromThisYear()))
         return valuation
     }
+
+    private fun beforeThisYear() = { operation: Operation -> operation.moment.year < year }
+    private fun fromThisYear() = { operation: Operation -> operation.moment.year == year }
+    private fun operationsMatching(operationFilter: (Operation) -> Boolean) =
+        ledger.operations()
+            .filter(operationFilter)
+
 }

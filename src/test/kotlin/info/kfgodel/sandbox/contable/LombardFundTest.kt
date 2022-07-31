@@ -29,7 +29,8 @@ class LombardFundTest : KotlinSpec() {
       }
 
       describe("yearly report") {
-        val report by let {fund().reportFor(2019)}
+        val reportYear by let { 2019 }
+        val report by let {fund().reportFor(reportYear())}
 
         it("is created for a year") {
           assertThat(report().year).isEqualTo(2019)
@@ -55,6 +56,78 @@ class LombardFundTest : KotlinSpec() {
             915.of(LOMBARD).at(16.59.of(USD)),
             37.of(LOMBARD).at(0.36.of(USD))
           ))
+        }
+
+        describe("when created for 2nd operation year") {
+          reportYear.set { 2020 }
+
+          it("includes all the operations done in that year"){
+            assertThat(report().operations()).hasSize(4)
+          }
+
+          it("has previous balances and profits at the beginning of first year") {
+            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
+              0.of(LOMBARD).at(0.of(USD))
+            ))
+            assertThat(report().valuationAtStart().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              915.of(LOMBARD).at(16.59.of(USD)),
+              37.of(LOMBARD).at(0.36.of(USD))
+            ))
+          }
+
+          it("has balance for all operated assets at end of year"){
+            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+              0.of(LOMBARD).at(0.of(USD))
+            ))
+          }
+
+          it("has profit an loss for all operations done"){
+            assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              936.of(LOMBARD).at(10.91.of(USD)),
+              3732.of(LOMBARD).at(28.84.of(USD)),
+              4659.of(LOMBARD).at(29.24.of(USD))
+            ))
+          }
+        }
+
+        describe("when created for 3rd operation year") {
+          reportYear.set { 2021 }
+
+          it("includes all the operations done in that year"){
+            assertThat(report().operations()).hasSize(9)
+          }
+
+          it("has previous balances and profits at the beginning of first year") {
+            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
+              0.of(LOMBARD).at(0.of(USD))
+            ))
+            assertThat(report().valuationAtStart().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              915.of(LOMBARD).at(16.59.of(USD)),
+              37.of(LOMBARD).at(0.36.of(USD)),
+              936.of(LOMBARD).at(10.91.of(USD)),
+              3732.of(LOMBARD).at(28.84.of(USD)),
+              4659.of(LOMBARD).at(29.24.of(USD))
+            ))
+          }
+
+          it("has balance for all operated assets at end of year"){
+            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+              0.of(LOMBARD).at(0.of(USD))
+            ))
+          }
+
+          it("has profit an loss for all operations done"){
+            assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+              9738.of(LOMBARD).at(86.75.of(USD)),
+              4607.of(LOMBARD).at(18.27.of(USD)),
+              11920.of(LOMBARD).at(40.81.of(USD)),
+              4603.of(LOMBARD).at(13.97.of(USD)),
+              5929.of(LOMBARD).at(17.19.of(USD)),
+              478.of(LOMBARD).at(0.88.of(USD)),
+              4596.of(LOMBARD).at(5.59.of(USD)),
+              14195.of(LOMBARD).at(10.07.of(USD))
+            ))
+          }
         }
       }
     }

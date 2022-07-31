@@ -95,6 +95,17 @@ class PortfolioValuationTest : KotlinSpec() {
               50.of(LOMBARD).at((-33.33).of(USD))
             ))
           }
+
+          it("can remove all profit and loses without affecting balances") {
+            valuation().include((-150).of(LOMBARD).at(200.of(USD)))
+            valuation().removeProfitAndLosses()
+
+            assertThat(valuation().profitAndLosses()).isEmpty()
+            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+              50.of(LOMBARD).at(100.of(USD)),
+              10.of("OTHER").at(10.of(USD))
+            ))
+          }
         }
       }
     }
