@@ -6,17 +6,24 @@ import info.kfgodel.contable.Magnitude
  * This class represents a change in the value of assets
  * Date: 31/7/22 - 12:14
  */
-class ValueChange(private val previous: ValuedAsset, private val replacement: ValuedAsset) : ValuedAsset {
+class ValueChange(private val previous: ValuedAsset, private val next: ValuedAsset) : ValuedAsset {
     override fun asset(): Magnitude {
         return previous.asset()
     }
 
     override fun value(): Magnitude {
-        val replacedProportion = replacement.proportionalTo(asset().amount)
-        val replacingValue = replacedProportion.value().negative() // Replacement always negates previous value signum
+        val replacingValue = replacement().value().negative() // Replacement always negates previous value signum
         val previousValue = previous.value()
         val valueDifference = replacingValue.minus(previousValue)
         return valueDifference
+    }
+
+    fun replaced(): ValuedAsset {
+        return previous
+    }
+
+    fun replacement(): ValuedAsset {
+        return next.proportionalTo(asset().amount)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -29,9 +36,9 @@ class ValueChange(private val previous: ValuedAsset, private val replacement: Va
 
     override fun toString(): String {
         val changeSymbol = when(value().amount.signum()){
-            1 -> "^"
-            -1 -> "v"
-            else -> "="
+            1 -> "↑"
+            -1 -> "↓"
+            else -> "≔"
         }
         return "${asset()} $changeSymbol ${value()}"
     }

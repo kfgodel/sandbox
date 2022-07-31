@@ -80,10 +80,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("reduces stored valuables with given amount"){
               assertThat(balance().valuables()).isEqualTo(listOf(90.of(LOMBARD).at(180.of(USD))))
             }
-            it("returns partially consumed valuable equal to updated value"){
-              assertThat(secondUpdate()).isEqualTo(listOf(
-                10.of(LOMBARD).at(20.of(USD))
-              ))
+            it("returns a change with partially consumed valuable and replaced valuable"){
+              val change = secondUpdate()[0]
+              assertThat(change.replaced()).isEqualTo(10.of(LOMBARD).at(20.of(USD)))
+              assertThat(change.replacement()).isEqualTo(10.of(LOMBARD).at((-100).of(USD)))
             }
           }
           describe("when second value is equal to current balance"){
@@ -97,10 +97,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("removes stored valuable"){
               assertThat(balance().valuables()).isEmpty()
             }
-            it("returns consumed valuable"){
-              assertThat(secondUpdate()).isEqualTo(listOf(
-                100.of(LOMBARD).at(200.of(USD))
-              ))
+            it("returns change with consumed valuable and replacement value"){
+              val change = secondUpdate()[0]
+              assertThat(change.replaced()).isEqualTo(100.of(LOMBARD).at(200.of(USD)))
+              assertThat(change.replacement()).isEqualTo(100.of(LOMBARD).at((-100).of(USD)))
             }
           }
           describe("when second value is bigger than current balance"){
@@ -114,10 +114,10 @@ class AssetBalanceTest : KotlinSpec() {
             it("replaces valuables with remaining from difference"){
               assertThat(balance().valuables()).isEqualTo(listOf((-100).of(LOMBARD).at(50.of(USD))))
             }
-            it("returns consumed valuable from previous balance"){
-              assertThat(secondUpdate()).isEqualTo(listOf(
-                100.of(LOMBARD).at(200.of(USD))
-              ))
+            it("returns change with consumed valuable from previous balance and its partial replacement"){
+              val change = secondUpdate()[0]
+              assertThat(change.replaced()).isEqualTo(100.of(LOMBARD).at(200.of(USD)))
+              assertThat(change.replacement()).isEqualTo(100.of(LOMBARD).at((-50).of(USD)))
             }
           }
         }
@@ -165,10 +165,10 @@ class AssetBalanceTest : KotlinSpec() {
                   10.of(LOMBARD).at(50.of(USD))
                 ))
               }
-              it("returns consumed asset from oldest valuable"){
-                assertThat(thirdUpdate()).isEqualTo(listOf(
-                  10.of(LOMBARD).at(20.of(USD))
-                ))
+              it("returns change with partially consumed oldest valuable and its replacement value"){
+                val change = thirdUpdate()[0]
+                assertThat(change.replaced()).isEqualTo(10.of(LOMBARD).at(20.of(USD)))
+                assertThat(change.replacement()).isEqualTo(10.of(LOMBARD).at((-100).of(USD)))
               }
             }
             describe("when 3rd value is equal to oldest value"){
@@ -184,10 +184,10 @@ class AssetBalanceTest : KotlinSpec() {
                   10.of(LOMBARD).at(50.of(USD))
                 ))
               }
-              it("returns consumed oldest valuable"){
-                assertThat(thirdUpdate()).isEqualTo(listOf(
-                  100.of(LOMBARD).at(200.of(USD))
-                ))
+              it("returns change with all consumed oldest valuable and its replacement value"){
+                val change = thirdUpdate()[0]
+                assertThat(change.replaced()).isEqualTo(100.of(LOMBARD).at(200.of(USD)))
+                assertThat(change.replacement()).isEqualTo(100.of(LOMBARD).at((-100).of(USD)))
               }
             }
             describe("when 3rd value is bigger than oldest value but smaller than 2nd"){
@@ -203,11 +203,13 @@ class AssetBalanceTest : KotlinSpec() {
                   5.of(LOMBARD).at(25.of(USD))
                 ))
               }
-              it("returns consumed oldest valuable and portion of consumed 2nd valuable"){
-                assertThat(thirdUpdate()).isEqualTo(listOf(
-                  100.of(LOMBARD).at(200.of(USD)),
-                  5.of(LOMBARD).at(25.of(USD))
-                ))
+              it("returns changes for all oldest valuable and a portion of consumed 2nd valuable and their replacement values"){
+                val changes = thirdUpdate()
+                assertThat(changes[0].replaced()).isEqualTo(100.of(LOMBARD).at(200.of(USD)))
+                assertThat(changes[0].replacement()).isEqualTo(100.of(LOMBARD).at((-95.24).of(USD)))
+
+                assertThat(changes[1].replaced()).isEqualTo(5.of(LOMBARD).at(25.of(USD)))
+                assertThat(changes[1].replacement()).isEqualTo(5.of(LOMBARD).at((-4.76).of(USD)))
               }
             }
             describe("when 3rd value is bigger than previous values"){
@@ -221,11 +223,13 @@ class AssetBalanceTest : KotlinSpec() {
               it("replaces valuables with remaining from difference"){
                 assertThat(balance().valuables()).isEqualTo(listOf((-90).of(LOMBARD).at(45.of(USD))))
               }
-              it("returns all consumed valuables"){
-                assertThat(thirdUpdate()).isEqualTo(listOf(
-                  100.of(LOMBARD).at(200.of(USD)),
-                  10.of(LOMBARD).at(50.of(USD))
-                ))
+              it("returns changes with all consumed valuables and their replacement values"){
+                val changes = thirdUpdate()
+                assertThat(changes[0].replaced()).isEqualTo(100.of(LOMBARD).at(200.of(USD)))
+                assertThat(changes[0].replacement()).isEqualTo(100.of(LOMBARD).at((-50).of(USD)))
+
+                assertThat(changes[1].replaced()).isEqualTo(10.of(LOMBARD).at(50.of(USD)))
+                assertThat(changes[1].replacement()).isEqualTo(10.of(LOMBARD).at((-5).of(USD)))
               }
             }
           }

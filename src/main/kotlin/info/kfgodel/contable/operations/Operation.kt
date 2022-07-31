@@ -32,4 +32,8 @@ data class Operation(val type: OperationType, val exchange: Exchange, val moment
     override fun hashCode(): Int {
         return this.myHash()
     }
+
+    override fun toString(): String {
+        return "$type $exchange on $moment"
+    }
 }

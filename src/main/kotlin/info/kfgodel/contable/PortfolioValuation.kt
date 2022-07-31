@@ -27,19 +27,14 @@ class PortfolioValuation(val valueUnit: String) {
                 valueUnit
             )
         }
-        val reduced = assetBalance.updateWith(included)
-        considerProfitAndLossesDueTo(reduced, included)
+        val changes = assetBalance.updateWith(included)
+        considerProfitAndLossesDueTo(changes)
     }
 
-    private fun considerProfitAndLossesDueTo(removed: List<ValuedAsset>, replacement: ValuedAsset) {
-        removed.forEach { previous ->
-            val change = ValueChange(previous, replacement)
-            if (change.isZero()) {
-                // Nor profit or loss
-            } else {
-                profitAndLosses.add(change)
-            }
-        }
+    private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
+        changes
+            .filter { change -> !change.isZero() } // Exclude changes that are not profit or losses
+            .forEach(profitAndLosses::add)
     }
 
     private fun validate(valued: ValuedAsset) {

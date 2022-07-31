@@ -34,7 +34,7 @@ class FractionalValuedAsset(val assetFraction: BigDecimal, private val original:
     }
 
     override fun toString(): String {
-        return "${asset()} = ${value()} from ${original}"
+        return "${asset()} @ ${value()} from ${original}"
     }
 
 }
