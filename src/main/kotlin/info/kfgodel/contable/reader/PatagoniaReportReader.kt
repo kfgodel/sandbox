@@ -32,7 +32,7 @@ class PatagoniaReportReader {
     private val operations = mutableListOf<Operation>()
 
     fun operations(): List<Operation> {
-        return operations
+        return operations.reversed() // File contains the newest first, we revert to do chronological order
     }
 
     fun addReport(lombardReport: String) {

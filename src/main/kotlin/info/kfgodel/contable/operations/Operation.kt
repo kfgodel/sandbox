@@ -22,7 +22,7 @@ data class Operation(val type: OperationType, val exchange: Exchange, val moment
     }
 
     override fun value(): Magnitude {
-        return type.applySignTo(exchange.price)
+        return exchange.price
     }
 
     override fun equals(other: Any?): Boolean {

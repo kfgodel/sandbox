@@ -7,17 +7,19 @@ import info.kfgodel.contable.operations.Operation
  * This class represents the summary report generated to close a fiscal year of fund operations
  * Date: 27/7/22 - 22:39
  */
-class AccountantReport(val year: Int,private val ledger: Ledger) {
+class AccountantReport(private val ledger: Ledger, val year: Int, private val valueUnit: String) {
     fun operations(): List<Operation> {
         return ledger.operations()
             .filter { operation -> operation.moment.year == year }
     }
 
-    fun assets(): Set<Magnitude> {
-        return ledger.assets(on(31,12,year))
+    fun valuationAtStart(): PortfolioValuation {
+        return PortfolioValuation(valueUnit)
     }
 
-    fun profitAndLosses(): Set<Magnitude> {
-        TODO("Not yet implemented")
+    fun valuationAtEnd(): PortfolioValuation {
+        val valuation = PortfolioValuation(valueUnit)
+        operations().forEach(valuation::include)
+        return valuation
     }
 }

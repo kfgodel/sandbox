@@ -40,12 +40,12 @@ class PatagoniaReportReaderTest : KotlinSpec() {
         assertThat(e).hasMessage("Report line has unexpected format. Expected[08/05/2019 SUSCRIPCION 1,04936100 952 998,99 u\$s] got:[bad format string]")
       })
 
-      it("can read multiple lines for a patagonia bank report"){
+      it("can read multiple lines for a patagonia bank report (returning in chronological order)"){
         reader().addReport("27/12/2019 RESCATE 1,06748600 915 976,75 u\$s\n" +
                 "08/05/2019 SUSCRIPCION 1,04936100 952 998,99 u\$s")
         assertThat(reader().operations()).containsExactly(
-          SELL.done(on(27,12,2019), 915.of(LOMBARD).at(976.75.of(USD))),
-          BUY.done(on(8,5,2019), 952.of(LOMBARD).at(998.99.of(USD)))
+          BUY.done(on(8,5,2019), 952.of(LOMBARD).at(998.99.of(USD))),
+          SELL.done(on(27,12,2019), 915.of(LOMBARD).at(976.75.of(USD)))
         )
       }
 

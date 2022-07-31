@@ -2,7 +2,9 @@ package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
 import info.kfgodel.contable.LombardFund
+import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
+import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -37,19 +39,24 @@ class LombardFundTest : KotlinSpec() {
           assertThat(report().operations()).hasSize(3)
         }
 
-        it("can value the assets at the beginning of the year") {
-
+        it("has no balances or profits at the beginning of first year") {
+          assertThat(report().valuationAtStart().balances()).isEmpty()
+          assertThat(report().valuationAtStart().profitAndLosses()).isEmpty()
         }
 
-        it("indicates amount of each asset at the end of the year") {
-          assertThat(report().assets()).containsExactly(0.of(LOMBARD), (16.95).of("USD"))
+        it("has balance for all operated assets at end of year"){
+          assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+            0.of(LOMBARD).at(0.of(USD))
+          ))
         }
 
-        it("summarizes P&L due to operations in assets for that year") {
-          assertThat(report().profitAndLosses()).containsExactly((16.95).of("USD"))
+        it("has profit an loss for all operations done"){
+          assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
+            915.of(LOMBARD).at(16.59.of(USD)),
+            37.of(LOMBARD).at(0.36.of(USD))
+          ))
         }
       }
-
     }
   }
 }

@@ -22,6 +22,6 @@ class LombardFund {
     }
 
     fun reportFor(year: Int): AccountantReport {
-        return AccountantReport(year, ledger)
+        return AccountantReport(ledger, year, USD)
     }
 }

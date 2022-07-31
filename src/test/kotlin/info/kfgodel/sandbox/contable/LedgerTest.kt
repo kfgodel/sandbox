@@ -88,12 +88,12 @@ class LedgerTest : KotlinSpec() {
           beforeEach {
             ledger().register(SELL.done(on(1,1,2020), 100.of(LOMBARD).at(100.of(USD))))
           }
-          it("values an asset negatively as debt") {
+          it("has a positive value for a negative asset as debt") {
             assertThat(valuation().balances()).hasSize(1)
 
             val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo((-100).of(LOMBARD))
-            assertThat(valuedAsset.value()).isEqualTo((-100).of(USD))
+            assertThat(valuedAsset.value()).isEqualTo(100.of(USD))
           }
 
           it("reduces debt valuation when buying same asset") {
@@ -102,7 +102,7 @@ class LedgerTest : KotlinSpec() {
 
             val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo((-50).of(LOMBARD))
-            assertThat(valuedAsset.value()).isEqualTo((-50).of(USD))
+            assertThat(valuedAsset.value()).isEqualTo(50.of(USD))
           }
 
           describe("for a second time") {
@@ -115,7 +115,7 @@ class LedgerTest : KotlinSpec() {
 
               val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo((-150).of(LOMBARD))
-              assertThat(valuedAsset.value()).isEqualTo((-200).of(USD))
+              assertThat(valuedAsset.value()).isEqualTo(200.of(USD))
             }
 
             it("reduces debt from the oldest sell when buying") {
@@ -124,7 +124,7 @@ class LedgerTest : KotlinSpec() {
 
               val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo((-100).of(LOMBARD))
-              assertThat(valuedAsset.value()).isEqualTo((-150).of(USD))
+              assertThat(valuedAsset.value()).isEqualTo(150.of(USD))
             }
           }
         }
