@@ -57,4 +57,8 @@ class PortfolioValuation(val valueUnit: String) {
         operations.forEach(this::include)
     }
 
+    fun totalProfitOrLoss(): Magnitude {
+        return profitAndLosses.fold(0.of(valueUnit)) { total, change -> total.sum(change.value()) }
+    }
+
 }

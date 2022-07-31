@@ -65,12 +65,15 @@ class PortfolioValuationTest : KotlinSpec() {
         describe("P&L") {
           it("does not change until an asset is reduced"){
             assertThat(valuation().profitAndLosses()).isEmpty()
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
           }
 
           it("does not change if asset is reduced at original price"){
             valuation().include((-50).of(LOMBARD).at(50.of(USD)))
             valuation().include((-5).of("OTHER").at(5.of(USD)))
             assertThat(valuation().profitAndLosses()).isEmpty()
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
           }
 
           it("generates losses when reducing asset for a worse price"){
@@ -79,6 +82,7 @@ class PortfolioValuationTest : KotlinSpec() {
               100.of(LOMBARD).at((-50).of(USD)),
               50.of(LOMBARD).at((-75).of(USD))
             ))
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo((-125).of(USD))
           }
 
           it("generates profit when reducing asset for a better price"){
@@ -86,6 +90,7 @@ class PortfolioValuationTest : KotlinSpec() {
             assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
               100.of(LOMBARD).at(100.of(USD))
             ))
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(100.of(USD))
           }
 
           it("generates profit and losses when price is better and worse than previous values"){
@@ -94,6 +99,7 @@ class PortfolioValuationTest : KotlinSpec() {
               100.of(LOMBARD).at(33.33.of(USD)),
               50.of(LOMBARD).at((-33.33).of(USD))
             ))
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
           }
 
           it("can remove all profit and loses without affecting balances") {
@@ -101,6 +107,7 @@ class PortfolioValuationTest : KotlinSpec() {
             valuation().removeProfitAndLosses()
 
             assertThat(valuation().profitAndLosses()).isEmpty()
+            assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
             assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
               50.of(LOMBARD).at(100.of(USD)),
               10.of("OTHER").at(10.of(USD))

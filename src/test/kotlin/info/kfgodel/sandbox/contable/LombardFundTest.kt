@@ -43,6 +43,7 @@ class LombardFundTest : KotlinSpec() {
         it("has no balances or profits at the beginning of first year") {
           assertThat(report().valuationAtStart().balances()).isEmpty()
           assertThat(report().valuationAtStart().profitAndLosses()).isEmpty()
+          assertThat(report().valuationAtStart().totalProfitOrLoss()).isEqualTo(0.of(USD))
         }
 
         it("has balance for all operated assets at end of year"){
@@ -56,6 +57,7 @@ class LombardFundTest : KotlinSpec() {
             915.of(LOMBARD).at(16.59.of(USD)),
             37.of(LOMBARD).at(0.36.of(USD))
           ))
+          assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(16.95.of(USD))
         }
 
         describe("when created for 2nd operation year") {
@@ -87,6 +89,7 @@ class LombardFundTest : KotlinSpec() {
               3732.of(LOMBARD).at(28.84.of(USD)),
               4659.of(LOMBARD).at(29.24.of(USD))
             ))
+            assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(68.99.of(USD))
           }
         }
 
@@ -127,6 +130,7 @@ class LombardFundTest : KotlinSpec() {
               4596.of(LOMBARD).at(5.59.of(USD)),
               14195.of(LOMBARD).at(10.07.of(USD))
             ))
+            assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(193.53.of(USD))
           }
         }
       }
