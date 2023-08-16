@@ -21,7 +21,7 @@ class LombardFundTest : KotlinSpec() {
       val fund by let { LombardFund() }
 
       it("has a ledger with all the operations in the lombard.txt file") {
-        assertThat(fund().ledger().operations()).hasSize(20)
+        assertThat(fund().ledger().operations()).hasSize(22)
       }
 
       it("can generate a yearly accountant report") {
@@ -83,7 +83,7 @@ class LombardFundTest : KotlinSpec() {
             ))
           }
 
-          it("has profit an loss for all operations done"){
+          it("has profit and loss for all operations done"){
             assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
               936.of(LOMBARD).at(10.91.of(USD)),
               3732.of(LOMBARD).at(28.84.of(USD)),
