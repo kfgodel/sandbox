@@ -129,6 +129,20 @@ class LedgerTest : KotlinSpec() {
           }
         }
       }
+
+      describe("when filtering operations by a condition") {
+        val operationsOf2020 by let { ledger().operationsMatching{ op -> op.moment.year == 2020 } }
+
+        it("returns no operation if nothing matches"){
+          assertThat(operationsOf2020()).isEmpty()
+        }
+
+        it("returns only the operations that matches the condition") {
+          ledger().register(BUY.done(on(1,1,2019), 1.of(LOMBARD).at(1.of(USD))))
+          ledger().register(BUY.done(on(1,1,2020), 2.of(LOMBARD).at(2.of(USD))))
+          assertThat(operationsOf2020()).containsExactly(BUY.done(on(1,1,2020), 2.of(LOMBARD).at(2.of(USD))))
+        }
+      }
     }
   }
 }

@@ -12,22 +12,6 @@ class Ledger {
 
     private val operations = TreeMap<LocalDateTime, MutableList<Operation>>()
 
-    fun assets(date: LocalDateTime): Set<Magnitude> {
-        val sums = TreeMap<String, Magnitude>()
-        operationsBy(date)
-            .forEach { operation ->
-            val gained = operation.gained()
-            sums.compute(gained.unit) { _, total ->
-                total?.sum(gained) ?: gained
-            }
-            val lost = operation.lost()
-            sums.compute(lost.unit) { _, total ->
-                total?.minus(lost) ?: lost.negative()
-            }
-        }
-        return sums.values.toSet()
-    }
-
     fun operations() = operations.values.flatten()
 
     fun register(operation: Operation) {
@@ -45,5 +29,9 @@ class Ledger {
     private fun operationsBy(date: LocalDateTime) = operations.values
         .flatten()
         .filter { operation -> operation.wasDoneBy(date) }
+
+    fun operationsMatching(condition: (Operation) -> Boolean): List<Operation> {
+        return operations().filter(condition)
+    }
 
 }
