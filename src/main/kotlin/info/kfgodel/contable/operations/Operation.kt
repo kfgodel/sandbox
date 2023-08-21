@@ -10,8 +10,6 @@ import java.time.LocalDateTime
  * Date: 26/6/22 - 22:53
  */
 data class Operation(val type: OperationType, val exchange: Exchange, val moment: LocalDateTime) : ValuedAsset {
-    fun gained(): Magnitude = type.gainedIn(exchange)
-    fun lost(): Magnitude = type.lostIn(exchange)
     fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
     fun valued(): ValuedAsset {
         return this

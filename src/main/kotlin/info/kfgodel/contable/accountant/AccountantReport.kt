@@ -1,5 +1,7 @@
-package info.kfgodel.contable
+package info.kfgodel.contable.accountant
 
+import info.kfgodel.contable.Ledger
+import info.kfgodel.contable.PortfolioValuation
 import info.kfgodel.contable.operations.Operation
 
 
@@ -8,7 +10,10 @@ import info.kfgodel.contable.operations.Operation
  * Date: 27/7/22 - 22:39
  */
 class AccountantReport(private val ledger: Ledger, val year: Int, private val valueUnit: String) {
-    fun operations(): List<Operation> {
+
+  private var records = emptyList<AccountantRecord>()
+
+  fun operations(): List<Operation> {
         return ledger.operationsMatching(fromThisYear())
     }
 
@@ -21,10 +26,14 @@ class AccountantReport(private val ledger: Ledger, val year: Int, private val va
     fun valuationAtEnd(): PortfolioValuation {
         val valuation = valuationAtStart()
         valuation.removeProfitAndLosses() // We don't care about previous P&G, only the ones on this year
-        valuation.includeAll(operations())
+        this.records = valuation.includeAll(operations())
         return valuation
     }
 
     private fun beforeThisYear() = { operation: Operation -> operation.moment.year < year }
     private fun fromThisYear() = { operation: Operation -> operation.moment.year == year }
+
+  fun records(): List<AccountantRecord> {
+    return this.records;
+  }
 }

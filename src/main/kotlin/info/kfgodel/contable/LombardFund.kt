@@ -1,5 +1,6 @@
 package info.kfgodel.contable
 
+import info.kfgodel.contable.accountant.AccountantReport
 import info.kfgodel.contable.reader.PatagoniaReportReader
 import java.io.File
 

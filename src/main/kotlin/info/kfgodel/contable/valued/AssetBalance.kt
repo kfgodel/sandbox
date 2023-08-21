@@ -38,7 +38,7 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
         validateUpdatedAsset(latest)
         val changes = mutableListOf<ValueChange>()
         var latestAsset = latest.asset()
-        while (!latestAsset.isZero() && !values.isEmpty()){ // While we have an amount to update and values to consume
+        while (!latestAsset.isZero() && values.isNotEmpty()){ // While we have an amount to update and values to consume
             val oldest = values.removeFirst()
             val oldestAsset = oldest.asset()
             val remainingAsset = oldestAsset.sum(latestAsset)

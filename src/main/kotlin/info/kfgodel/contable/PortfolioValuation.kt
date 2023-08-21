@@ -1,5 +1,6 @@
 package info.kfgodel.contable
 
+import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.operations.Operation
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
@@ -19,7 +20,7 @@ class PortfolioValuation(val valueUnit: String) {
         return valuesPerAssetUnit.values.toList()
     }
 
-    fun include(included: ValuedAsset) {
+    fun include(included: ValuedAsset): List<ValueChange> {
         validate(included)
         val includedAssetUnit = included.asset().unit
         val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
@@ -30,6 +31,7 @@ class PortfolioValuation(val valueUnit: String) {
         }
         val changes = assetBalance.updateWith(included)
         considerProfitAndLossesDueTo(changes)
+      return changes
     }
 
     private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
@@ -53,8 +55,11 @@ class PortfolioValuation(val valueUnit: String) {
         this.profitAndLosses.clear()
     }
 
-    fun includeAll(operations: Iterable<Operation>) {
-        operations.forEach(this::include)
+    fun includeAll(operations: Iterable<Operation>): List<AccountantRecord> {
+      return operations.map { operation ->
+        val changes = this.include(operation)
+        AccountantRecord(operation, changes)
+      }
     }
 
     fun totalProfitOrLoss(): Magnitude {

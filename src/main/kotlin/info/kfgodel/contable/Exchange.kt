@@ -8,7 +8,7 @@ import info.kfgodel.contable.valued.ValuedAsset
  */
 data class Exchange(val asset: Magnitude, val price: Magnitude) : ValuedAsset {
     override fun toString(): String {
-        return "$asset x $price"
+        return "$asset @ $price"
     }
 
     override fun asset(): Magnitude {

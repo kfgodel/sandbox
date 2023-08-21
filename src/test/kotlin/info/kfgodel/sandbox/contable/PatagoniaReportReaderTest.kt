@@ -52,7 +52,7 @@ class PatagoniaReportReaderTest : KotlinSpec() {
       it("can read operations from a report file"){
         val reportFile = File(this.javaClass.classLoader.getResource("lombard.txt").file)
         reader().addReportFile(reportFile)
-        assertThat(reader().operations()).hasSize(20)
+        assertThat(reader().operations()).hasSize(22)
       }
     }
   }

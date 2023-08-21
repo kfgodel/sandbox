@@ -1,6 +1,7 @@
 package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.Magnitude
+import java.math.BigDecimal
 
 /**
  * This class represents a change in the value of assets
@@ -35,17 +36,21 @@ class ValueChange(private val previous: ValuedAsset, private val next: ValuedAss
     }
 
     override fun toString(): String {
-        val changeSymbol = when(value().amount.signum()){
-            1 -> "↑"
-            -1 -> "↓"
-            else -> "≔"
-        }
-        return "${asset()} $changeSymbol ${value()}"
+      val symbol = changeSymbolFor(value().amount)
+      return "$symbol ${value()} [${replacement()}, ${replaced()}]"
     }
 
-    fun isZero(): Boolean {
+  fun isZero(): Boolean {
         return value().isZero()
     }
-
-
 }
+
+fun changeSymbolFor(amount: BigDecimal): String {
+  val changeSymbol = when (amount.signum()) {
+    1 -> "↑"
+    -1 -> "↓"
+    else -> "≔"
+  }
+  return changeSymbol
+}
+
