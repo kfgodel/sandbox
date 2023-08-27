@@ -6,32 +6,53 @@ import info.kfgodel.contable.valued.ValuedAsset
 import java.time.LocalDateTime
 
 /**
- * This type represents a buy operation (from the buyer perspective)
+ * This type represents an asset operation (increase, decrease, sell, buy, exchange assets)
  * Date: 26/6/22 - 22:53
  */
-data class Operation(val type: OperationType, val exchange: Exchange, val moment: LocalDateTime) : ValuedAsset {
-    fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
-    fun valued(): ValuedAsset {
-        return this
-    }
+data class Operation(
+  val type: OperationType,
+  val exchange: Exchange,
+  val moment: LocalDateTime,
+  val mainAccount: String = UNDEFINED_ACCOUNT,
+  val externalAccount: String = UNDEFINED_ACCOUNT
+) : ValuedAsset {
+  fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
+  fun valued(): ValuedAsset {
+    return this
+  }
 
-    override fun asset(): Magnitude {
-        return type.applySignTo(exchange.asset)
-    }
+  override fun asset(): Magnitude {
+    return type.applySignTo(exchange.asset)
+  }
 
-    override fun value(): Magnitude {
-        return exchange.price
-    }
+  override fun value(): Magnitude {
+    return exchange.price
+  }
 
-    override fun equals(other: Any?): Boolean {
-        return this.isEqualTo(other)
-    }
+  override fun equals(other: Any?): Boolean {
+    return this.isEqualTo(other)
+  }
 
-    override fun hashCode(): Int {
-        return this.myHash()
-    }
+  override fun hashCode(): Int {
+    return this.myHash()
+  }
 
-    override fun toString(): String {
-        return "$type $exchange on $moment"
-    }
+  override fun toString(): String {
+    val usingAccount = mainAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
+    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " and $acc" }
+    return "$type $exchange on $moment$usingAccount$andAccount"
+  }
+
+  fun using(accountName: String): Operation {
+    return Operation(type, exchange, moment, accountName)
+  }
+
+  fun and(accountName: String): Operation {
+    return Operation(type, exchange, moment, mainAccount, accountName)
+  }
+
+  companion object {
+    const val UNDEFINED_ACCOUNT = "UNDEFINED"
+  }
+
 }

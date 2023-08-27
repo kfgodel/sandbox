@@ -6,3 +6,6 @@ package info.kfgodel.contable
 const val LOMBARD = "LOMBARD"
 const val USD = "USD"
 const val ARS = "ARS"
+const val DAI = "DAI"
+const val BTC = "BTC"
+const val ETH = "ETH"

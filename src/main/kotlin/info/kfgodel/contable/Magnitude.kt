@@ -31,7 +31,11 @@ data class Magnitude(val amount: BigDecimal, val unit:String) {
         return this.amount.abs() > other.amount.abs()
     }
 
-    companion object {
+  fun exchanged(): Exchange {
+    return this.at(this)
+  }
+
+  companion object {
         val ROUNDING = RoundingMode.HALF_EVEN
         val MATH_CTX = MathContext(16, ROUNDING)
     }
