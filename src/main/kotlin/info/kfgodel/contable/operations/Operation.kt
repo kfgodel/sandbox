@@ -17,9 +17,6 @@ data class Operation(
   val externalAccount: String = UNDEFINED_ACCOUNT
 ) : ValuedAsset {
   fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
-  fun valued(): ValuedAsset {
-    return this
-  }
 
   override fun asset(): Magnitude {
     return type.applySignTo(exchange.asset)

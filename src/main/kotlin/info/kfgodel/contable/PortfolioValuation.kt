@@ -20,7 +20,7 @@ class PortfolioValuation(val valueUnit: String) {
         return valuesPerAssetUnit.values.toList()
     }
 
-    fun include(included: ValuedAsset): List<ValueChange> {
+    fun include(included: Operation): List<ValueChange> {
         validate(included)
         val includedAssetUnit = included.asset().unit
         val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->

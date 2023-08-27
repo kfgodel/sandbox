@@ -21,7 +21,7 @@ class Ledger {
     fun valuation(referenceDate: LocalDateTime, valueUnit: String): PortfolioValuation {
         val valuation = PortfolioValuation(valueUnit)
         operationsBy(referenceDate).forEach { operation ->
-            valuation.include(operation.valued())
+            valuation.include(operation)
         }
         return valuation
     }
