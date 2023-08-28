@@ -50,6 +50,7 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
           operations.addLast(consumed)
           currentOperation = zero // nothing left to distribute
         }else{
+          // One operation cancels the other total or partially. We have a value change
           val (consumedOldest, remainingOldest) = oldestOperation.splitBy(currentAsset.amount.abs())
           val (consumedCurrent, remainingCurrent) = currentOperation.splitBy(oldestAsset.amount.abs())
           changes.add(ValueChange(consumedOldest, consumedCurrent))
