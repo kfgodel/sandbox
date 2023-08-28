@@ -21,9 +21,6 @@ class FractionalValuedAsset(val assetFraction: BigDecimal, private val original:
     private fun originalAsset() = original.asset()
     private fun originalValue() = original.value()
 
-    override fun proportionalTo(fraction: BigDecimal): ValuedAsset {
-        return FractionalValuedAsset(fraction, original)
-    }
 
     override fun equals(other: Any?): Boolean {
         return this.isEqualTo(other)

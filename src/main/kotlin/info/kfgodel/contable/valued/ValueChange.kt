@@ -1,30 +1,31 @@
 package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.Magnitude
+import info.kfgodel.contable.operations.Operation
 import java.math.BigDecimal
 
 /**
  * This class represents a change in the value of assets
  * Date: 31/7/22 - 12:14
  */
-class ValueChange(private val previous: ValuedAsset, private val next: ValuedAsset) : ValuedAsset {
+class ValueChange(private val previous: Operation, private val next: Operation) : ValuedAsset {
     override fun asset(): Magnitude {
         return previous.asset()
     }
 
     override fun value(): Magnitude {
-        val replacingValue = replacement().value().negative() // Replacement always negates previous value signum
-        val previousValue = previous.value()
+        val replacingValue = replacement().value() // Replacement always negates previous value signum
+        val previousValue = replaced().value()
         val valueDifference = replacingValue.minus(previousValue)
         return valueDifference
     }
 
-    fun replaced(): ValuedAsset {
+    fun replaced(): Operation {
         return previous
     }
 
-    fun replacement(): ValuedAsset {
-        return next.proportionalTo(asset().amount)
+    fun replacement(): Operation {
+      return next
     }
 
     override fun equals(other: Any?): Boolean {

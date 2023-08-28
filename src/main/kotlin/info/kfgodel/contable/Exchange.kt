@@ -1,6 +1,7 @@
 package info.kfgodel.contable
 
 import info.kfgodel.contable.valued.ValuedAsset
+import java.math.BigDecimal
 
 /**
  * This type reprents an exchange of two assets which implies a exchange rate
@@ -18,4 +19,10 @@ data class Exchange(val asset: Magnitude, val price: Magnitude) : ValuedAsset {
     override fun value(): Magnitude {
         return price
     }
+
+  fun proportionalto(newAssetAmount: BigDecimal): Exchange {
+    val newValueAmount = value().amount.multiply(newAssetAmount)
+      .divide(asset().amount, Magnitude.MATH_CTX)
+    return newAssetAmount.of(asset().unit).at(newValueAmount.of(value().unit))
+  }
 }

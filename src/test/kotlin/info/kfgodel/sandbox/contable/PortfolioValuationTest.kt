@@ -4,6 +4,9 @@ import info.kfgodel.contable.LOMBARD
 import info.kfgodel.contable.PortfolioValuation
 import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
+import info.kfgodel.contable.on
+import info.kfgodel.contable.operations.OperationType.BUY
+import info.kfgodel.contable.operations.OperationType.SELL
 import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
@@ -29,16 +32,22 @@ class PortfolioValuationTest : KotlinSpec() {
       }
 
       itThrows(UnsupportedOperationException::class.java, "if a value with different unit is included",{
-        valuation().include(1.of("ANY").at(1.of("ARS")))
+        valuation().include(BUY.done(on(1,1,2001),1.of("ANY").at(1.of("ARS"))))
       }, { e ->
         assertThat(e).hasMessage("Include using a different value[ARS] than expected[USD]")
       })
 
       describe("when values are included") {
         beforeEach {
-          valuation().include(100.of(LOMBARD).at(100.of(USD)))
-          valuation().include(100.of(LOMBARD).at(200.of(USD)))
-          valuation().include(10.of("OTHER").at(10.of(USD)))
+          valuation().include(
+            BUY.done(on(1,1,2001),100.of(LOMBARD).at(100.of(USD)))
+          )
+          valuation().include(
+            BUY.done(on(1,1,2001),100.of(LOMBARD).at(200.of(USD)))
+          )
+          valuation().include(
+            BUY.done(on(1,1,2001),10.of("OTHER").at(10.of(USD)))
+          )
         }
 
         describe("balances") {
@@ -51,9 +60,9 @@ class PortfolioValuationTest : KotlinSpec() {
           }
 
           it("are updated as new values are included"){
-            valuation().include((-150).of(LOMBARD).at(100.of(USD)))
-            valuation().include(10.of("OTHER").at(50.of(USD)))
-            valuation().include((-10).of("OTHER").at(50.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),150.of(LOMBARD).at(100.of(USD))))
+            valuation().include(BUY.done(on(1,1,2001),10.of("OTHER").at(50.of(USD))))
+            valuation().include(SELL.done(on(1,1,2001),10.of("OTHER").at(50.of(USD))))
 
             assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
               50.of(LOMBARD).at(100.of(USD)),
@@ -70,14 +79,14 @@ class PortfolioValuationTest : KotlinSpec() {
           }
 
           it("does not change if asset is reduced at original price"){
-            valuation().include((-50).of(LOMBARD).at(50.of(USD)))
-            valuation().include((-5).of("OTHER").at(5.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),50.of(LOMBARD).at(50.of(USD))))
+            valuation().include(SELL.done(on(1,1,2001),5.of("OTHER").at(5.of(USD))))
             assertThat(valuation().profitAndLosses()).isEmpty()
             assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
           }
 
           it("generates losses when reducing asset for a worse price"){
-            valuation().include((-150).of(LOMBARD).at(75.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),150.of(LOMBARD).at(75.of(USD))))
             assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
               100.of(LOMBARD).at((-50).of(USD)),
               50.of(LOMBARD).at((-75).of(USD))
@@ -86,7 +95,7 @@ class PortfolioValuationTest : KotlinSpec() {
           }
 
           it("generates profit when reducing asset for a better price"){
-            valuation().include((-150).of(LOMBARD).at(300.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),150.of(LOMBARD).at(300.of(USD))))
             assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
               100.of(LOMBARD).at(100.of(USD))
             ))
@@ -94,7 +103,7 @@ class PortfolioValuationTest : KotlinSpec() {
           }
 
           it("generates profit and losses when price is better and worse than previous values"){
-            valuation().include((-150).of(LOMBARD).at(200.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),150.of(LOMBARD).at(200.of(USD))))
             assertThat(valuation().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
               100.of(LOMBARD).at(33.33.of(USD)),
               50.of(LOMBARD).at((-33.33).of(USD))
@@ -103,7 +112,7 @@ class PortfolioValuationTest : KotlinSpec() {
           }
 
           it("can remove all profit and loses without affecting balances") {
-            valuation().include((-150).of(LOMBARD).at(200.of(USD)))
+            valuation().include(SELL.done(on(1,1,2001),150.of(LOMBARD).at(200.of(USD))))
             valuation().removeProfitAndLosses()
 
             assertThat(valuation().profitAndLosses()).isEmpty()

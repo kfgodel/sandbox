@@ -30,8 +30,7 @@ class ScreenPrinter(private val report: AccountantReport) {
       println("- ${record.operation.moment} $tipoOperacion ${record.operation.exchange.asset} @ ${record.operation.value()}")
       val operationChanges = record.changes
       for (change in operationChanges) {
-        println("\t- ${change}")
-        println("\t- ${changeSymbolFor(change.value().amount)} ${change.value()} [${change.replacement().asset()} @ ${change.replacement().value()} desde ${change.replaced().value()} en ...")
+        println("\t- ${changeSymbolFor(change.value().amount)} ${change.value()} [${change.replaced().asset()} @ ${change.replacement().value()} contra ${change.replaced().value()} en ${change.replaced().moment}]")
       }
     }
     val totalProfitOrLoss = endingValuation.totalProfitOrLoss()

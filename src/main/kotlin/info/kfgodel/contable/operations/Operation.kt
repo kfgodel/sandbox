@@ -3,6 +3,7 @@ package info.kfgodel.contable.operations
 import info.kfgodel.contable.Exchange
 import info.kfgodel.contable.Magnitude
 import info.kfgodel.contable.valued.ValuedAsset
+import java.math.BigDecimal
 import java.time.LocalDateTime
 
 /**
@@ -46,6 +47,13 @@ data class Operation(
 
   fun and(accountName: String): Operation {
     return Operation(type, exchange, moment, mainAccount, accountName)
+  }
+
+  fun splitBy(splitAmount: BigDecimal): Pair<Operation, Operation> {
+    val splitOperation = Operation(type,exchange.proportionalto(splitAmount),moment,mainAccount,externalAccount)
+    val remainingAmount = exchange.asset().amount.minus(splitAmount)
+    val remainingOperation = Operation(type,exchange.proportionalto(remainingAmount),moment,mainAccount,externalAccount)
+    return Pair(splitOperation, remainingOperation)
   }
 
   companion object {
