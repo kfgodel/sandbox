@@ -44,30 +44,20 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
         val oldestAsset = oldestOperation.asset()
         val currentAsset = currentOperation.asset()
         if(currentAsset.hasSameSignumAs(oldestAsset)){
-          // Both operations go into the same direction (increase or decrease). We keep both
+          // Both operations go in the same direction without consuming each other. We keep both
           val (consumed, zero) = currentOperation.splitBy(currentAsset.amount.abs())
           operations.addFirst(oldestOperation)
           operations.addLast(consumed)
           currentOperation = zero // nothing left to distribute
         }else{
-          if(currentAsset.isBiggerThan(oldestAsset)){
-            // The new operation consumes all the oldest. We calculate how much remains of the current
-            val (consumed, notConsumed) = currentOperation.splitBy(oldestAsset.amount.abs())
-            changes.add(ValueChange(oldestOperation, consumed))
-            currentOperation = notConsumed // Distribute the left on other old operations
-          }else if(oldestAsset.isBiggerThan(currentAsset)){
-            // The oldest operation consumes all the new. We calculate how much remains of the oldest
-            val (consumed, notConsumed) = oldestOperation.splitBy(currentAsset.amount.abs())
-            operations.addFirst(notConsumed)
-            val (consumer, zero) = currentOperation.splitBy(currentAsset.amount.abs())
-            changes.add(ValueChange(consumed, consumer))
-            currentOperation = zero
-          } else{
-            // Both operations consume each other
-            val (consumer, zero) = currentOperation.splitBy(currentAsset.amount.abs())
-            changes.add(ValueChange(oldestOperation, consumer))
-            currentOperation = zero
+          val (consumedOldest, remainingOldest) = oldestOperation.splitBy(currentAsset.amount.abs())
+          val (consumedCurrent, remainingCurrent) = currentOperation.splitBy(oldestAsset.amount.abs())
+          changes.add(ValueChange(consumedOldest, consumedCurrent))
+          if(!remainingOldest.asset().isZero()){
+            // The oldest operation still has remaining value to use in next update
+            operations.addFirst(remainingOldest)
           }
+          currentOperation = remainingCurrent
         }
       }
       if(!currentOperation.asset().isZero()){

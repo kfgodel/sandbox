@@ -50,8 +50,9 @@ data class Operation(
   }
 
   fun splitBy(splitAmount: BigDecimal): Pair<Operation, Operation> {
-    val splitOperation = Operation(type,exchange.proportionalto(splitAmount),moment,mainAccount,externalAccount)
-    val remainingAmount = exchange.asset().amount.minus(splitAmount)
+    val limitedAmount = splitAmount.min(exchange.asset.amount) // We cannot split what we don't have
+    val splitOperation = Operation(type,exchange.proportionalto(limitedAmount),moment,mainAccount,externalAccount)
+    val remainingAmount = exchange.asset().amount.minus(limitedAmount)
     val remainingOperation = Operation(type,exchange.proportionalto(remainingAmount),moment,mainAccount,externalAccount)
     return Pair(splitOperation, remainingOperation)
   }
