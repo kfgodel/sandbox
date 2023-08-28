@@ -36,45 +36,45 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
     }
 
     fun updateWith(newOperation: Operation) : List<ValueChange> {
-        validateUpdatedAsset(newOperation)
-        val changes = mutableListOf<ValueChange>()
-        var newAsset = newOperation.asset()
-        while (!newAsset.isZero() && operations.isNotEmpty()){ // While we have an amount to update and values to consume
-            val oldestOperation = operations.removeFirst()
-            val oldestAsset = oldestOperation.asset()
-            val resultingAsset = oldestAsset.sum(newAsset)
-            if(resultingAsset.hasSameSignumAs(oldestAsset)){
-                // We didn't consume all the oldest asset
-                if(resultingAsset.isBiggerThan(oldestAsset)){
-                    // It's an increase of assets not a consumption. We keep both
-                    operations.addFirst(oldestOperation)
-                    operations.addLast(newOperation)
-                }else{
-                    // We keep only what wasn't consumed from the oldest
-                  val (notConsumed, consumed) = oldestOperation.splitBy(resultingAsset.amount.abs())
-                  operations.addFirst(notConsumed)
-                  val (consumer,_) = newOperation.splitBy(newAsset.amount.abs())
-                  changes.add(ValueChange(consumed, consumer))
-                }
-                newAsset = 0.of(assetUnit)
-            }else{
-              // We consumed all the oldest asset, but there may be more to be updated
-              val (consumed, notConsumed) = newOperation.splitBy(oldestAsset.amount.abs())
-              changes.add(ValueChange(oldestOperation, consumed)) // Nothing left on the new asset either
-              newAsset = resultingAsset
-            }
+      validateUpdatedAsset(newOperation)
+      val changes = mutableListOf<ValueChange>()
+      var currentOperation = newOperation
+      while (!currentOperation.asset().isZero() && operations.isNotEmpty()){ // While we have an amount to update and values to consume
+        val oldestOperation = operations.removeFirst()
+        val oldestAsset = oldestOperation.asset()
+        val currentAsset = currentOperation.asset()
+        if(currentAsset.hasSameSignumAs(oldestAsset)){
+          // Both operations go into the same direction (increase or decrease). We keep both
+          val (consumed, zero) = currentOperation.splitBy(currentAsset.amount.abs())
+          operations.addFirst(oldestOperation)
+          operations.addLast(consumed)
+          currentOperation = zero // nothing left to distribute
+        }else{
+          if(currentAsset.isBiggerThan(oldestAsset)){
+            // The new operation consumes all the oldest. We calculate how much remains of the current
+            val (consumed, notConsumed) = currentOperation.splitBy(oldestAsset.amount.abs())
+            changes.add(ValueChange(oldestOperation, consumed))
+            currentOperation = notConsumed // Distribute the left on other old operations
+          }else if(oldestAsset.isBiggerThan(currentAsset)){
+            // The oldest operation consumes all the new. We calculate how much remains of the oldest
+            val (consumed, notConsumed) = oldestOperation.splitBy(currentAsset.amount.abs())
+            operations.addFirst(notConsumed)
+            val (consumer, zero) = currentOperation.splitBy(currentAsset.amount.abs())
+            changes.add(ValueChange(consumed, consumer))
+            currentOperation = zero
+          } else{
+            // Both operations consume each other
+            val (consumer, zero) = currentOperation.splitBy(currentAsset.amount.abs())
+            changes.add(ValueChange(oldestOperation, consumer))
+            currentOperation = zero
+          }
         }
-        if(!newAsset.isZero()){
-            // We still have an amount to update after consuming all pre-existing values. This changes balance signum
-            val newValue = if (newAsset == newOperation.asset()) {
-                newOperation // Everything is still un-consumed
-            } else {
-              val (notConsumed, _) = newOperation.splitBy(newAsset.amount.abs())
-              notConsumed // Only what was not consumed remains
-            }
-            operations.addFirst(newValue)
-        }
-        return changes
+      }
+      if(!currentOperation.asset().isZero()){
+          // We still have an amount to update after consuming all pre-existing values. This changes balance signum
+          operations.addFirst(currentOperation)
+      }
+      return changes
     }
 
     private fun validateUpdatedAsset(valued: ValuedAsset) {
