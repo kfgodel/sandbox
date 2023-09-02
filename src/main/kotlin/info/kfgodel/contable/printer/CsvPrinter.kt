@@ -2,8 +2,8 @@ package info.kfgodel.contable.printer
 
 import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
-import info.kfgodel.contable.operations.Operation
-import info.kfgodel.contable.operations.OperationType
+import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.concepts.OperationType
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
 

@@ -1,7 +1,8 @@
-package info.kfgodel.contable.operations
+package info.kfgodel.contable.concepts
 
-import info.kfgodel.contable.Exchange
-import info.kfgodel.contable.Magnitude
+import info.kfgodel.contable.concepts.Exchange
+import info.kfgodel.contable.concepts.Magnitude
+import info.kfgodel.contable.concepts.Operation
 import java.time.LocalDateTime
 
 /**

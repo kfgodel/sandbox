@@ -1,6 +1,6 @@
 package info.kfgodel.contable.accountant
 
-import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.valued.ValueChange
 
 /**

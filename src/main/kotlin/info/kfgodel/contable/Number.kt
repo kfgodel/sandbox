@@ -1,5 +1,6 @@
 package info.kfgodel.contable
 
+import info.kfgodel.contable.concepts.Magnitude
 import java.math.BigDecimal
 import java.math.RoundingMode
 

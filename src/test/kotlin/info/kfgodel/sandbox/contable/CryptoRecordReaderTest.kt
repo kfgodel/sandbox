@@ -3,11 +3,11 @@ package info.kfgodel.sandbox.contable
 import info.kfgodel.contable.ARS
 import info.kfgodel.contable.DAI
 import info.kfgodel.contable.USD
+import info.kfgodel.contable.concepts.OperationType.BUY
+import info.kfgodel.contable.concepts.OperationType.DEPOSIT
+import info.kfgodel.contable.concepts.OperationType.WITHDRAW
 import info.kfgodel.contable.of
 import info.kfgodel.contable.on
-import info.kfgodel.contable.operations.OperationType.BUY
-import info.kfgodel.contable.operations.OperationType.DEPOSIT
-import info.kfgodel.contable.operations.OperationType.WITHDRAW
 import info.kfgodel.contable.reader.CryptoRecordReader
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec

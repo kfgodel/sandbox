@@ -1,4 +1,4 @@
-package info.kfgodel.contable
+package info.kfgodel.contable.concepts
 
 import java.math.BigDecimal
 import java.math.MathContext

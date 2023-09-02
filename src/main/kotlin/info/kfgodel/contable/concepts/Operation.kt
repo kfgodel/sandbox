@@ -1,7 +1,5 @@
-package info.kfgodel.contable.operations
+package info.kfgodel.contable.concepts
 
-import info.kfgodel.contable.Exchange
-import info.kfgodel.contable.Magnitude
 import info.kfgodel.contable.valued.ValuedAsset
 import java.math.BigDecimal
 import java.time.LocalDateTime

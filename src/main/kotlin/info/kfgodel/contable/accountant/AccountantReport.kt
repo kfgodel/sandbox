@@ -1,8 +1,7 @@
 package info.kfgodel.contable.accountant
 
-import info.kfgodel.contable.Ledger
-import info.kfgodel.contable.PortfolioValuation
-import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.concepts.Ledger
+import info.kfgodel.contable.concepts.Operation
 
 
 /**

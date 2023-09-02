@@ -1,13 +1,14 @@
 package info.kfgodel.contable.scripts
 
-import info.kfgodel.contable.LombardFund
+import info.kfgodel.contable.USD
+import info.kfgodel.contable.concepts.Ledger
 import info.kfgodel.contable.printer.ScreenPrinter
+import info.kfgodel.contable.reader.PatagoniaReportReader
 
 fun main() {
-    for (year in 2019..2023) {
-        val report = LombardFund().reportFor(year)
-      ScreenPrinter(report)
-        .print()
-
-    }
+  val ledger = Ledger().fromFile("lombard.txt", PatagoniaReportReader())
+  for (year in 2019..2023) {
+    val report = ledger.reportFor(year, USD)
+    ScreenPrinter(report).print()
+  }
 }

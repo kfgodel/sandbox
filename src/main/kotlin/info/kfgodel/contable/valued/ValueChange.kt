@@ -1,7 +1,7 @@
 package info.kfgodel.contable.valued
 
-import info.kfgodel.contable.Magnitude
-import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.concepts.Magnitude
+import info.kfgodel.contable.concepts.Operation
 import java.math.BigDecimal
 
 /**

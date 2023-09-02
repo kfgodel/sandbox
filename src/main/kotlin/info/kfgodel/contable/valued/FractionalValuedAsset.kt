@@ -1,6 +1,6 @@
 package info.kfgodel.contable.valued
 
-import info.kfgodel.contable.Magnitude
+import info.kfgodel.contable.concepts.Magnitude
 import info.kfgodel.contable.of
 import java.math.BigDecimal
 

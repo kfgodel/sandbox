@@ -2,7 +2,7 @@ package info.kfgodel.contable.printer
 
 import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
-import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.changeSymbolFor
 

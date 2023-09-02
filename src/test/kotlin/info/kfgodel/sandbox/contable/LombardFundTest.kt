@@ -1,7 +1,7 @@
 package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
-import info.kfgodel.contable.LombardFund
+import info.kfgodel.contable.funds.LombardFund
 import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
 import info.kfgodel.contable.valued.ValuedAsset

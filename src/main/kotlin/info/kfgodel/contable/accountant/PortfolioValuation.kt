@@ -1,7 +1,8 @@
-package info.kfgodel.contable
+package info.kfgodel.contable.accountant
 
-import info.kfgodel.contable.accountant.AccountantRecord
-import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.concepts.Magnitude
+import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.of
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.ValuedAsset

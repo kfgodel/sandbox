@@ -1,12 +1,12 @@
 package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
-import info.kfgodel.contable.PortfolioValuation
+import info.kfgodel.contable.accountant.PortfolioValuation
 import info.kfgodel.contable.USD
 import info.kfgodel.contable.of
 import info.kfgodel.contable.on
-import info.kfgodel.contable.operations.OperationType.BUY
-import info.kfgodel.contable.operations.OperationType.SELL
+import info.kfgodel.contable.concepts.OperationType.BUY
+import info.kfgodel.contable.concepts.OperationType.SELL
 import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec

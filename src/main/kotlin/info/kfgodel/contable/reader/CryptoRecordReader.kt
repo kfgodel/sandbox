@@ -5,11 +5,11 @@ import info.kfgodel.contable.ARS
 import info.kfgodel.contable.BTC
 import info.kfgodel.contable.DAI
 import info.kfgodel.contable.ETH
-import info.kfgodel.contable.Exchange
 import info.kfgodel.contable.USD
+import info.kfgodel.contable.concepts.Exchange
+import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.concepts.OperationType
 import info.kfgodel.contable.of
-import info.kfgodel.contable.operations.Operation
-import info.kfgodel.contable.operations.OperationType
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -26,7 +26,7 @@ import java.util.Locale
  * This class represents a reader of crypto transactions recorded over time
  * Date: 27/8/23 - 14:22
  */
-class CryptoRecordReader {
+class CryptoRecordReader: OperationsReader {
   private val LINE_REGEX = """(\w+)\t(\d{4}-\d{2}-\d{2})\t(COMPRA|VENTA|DEPOSITO|RETIRO|TRANSFER|COMISION|INTERESES)\t(\w+)?\t(-?\d[\d.,]*)?\t(\w+)\t(-?\d[\d.,]*)\t?(.+)?""".toRegex()
   private val DECIMAL_FORMATTER = (NumberFormat.getInstance(Locale.US) as DecimalFormat)
     .also { formatter -> formatter.setParseBigDecimal(true) }
@@ -34,7 +34,7 @@ class CryptoRecordReader {
 
   private val operations = mutableListOf<Operation>()
 
-  fun operations(): List<Operation> {
+  override fun operations(): List<Operation> {
     return operations.reversed() // File contains the newest first, we revert to do chronological order
   }
 
@@ -116,7 +116,7 @@ class CryptoRecordReader {
     }
   }
 
-  fun addReportFile(reportFile: File): CryptoRecordReader {
+  override fun addReportFile(reportFile: File): CryptoRecordReader {
     val reportContent = Files.readString(reportFile.toPath())
     addReport(reportContent)
     return this

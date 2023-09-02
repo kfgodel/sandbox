@@ -2,12 +2,12 @@ package info.kfgodel.contable.reader
 
 import com.google.common.base.Splitter
 import info.kfgodel.contable.ARS
-import info.kfgodel.contable.Exchange
 import info.kfgodel.contable.LOMBARD
 import info.kfgodel.contable.USD
+import info.kfgodel.contable.concepts.Exchange
+import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.concepts.OperationType
 import info.kfgodel.contable.of
-import info.kfgodel.contable.operations.Operation
-import info.kfgodel.contable.operations.OperationType
 import java.io.File
 import java.math.BigDecimal
 import java.nio.file.Files
@@ -23,7 +23,7 @@ import java.util.Locale
  * This class represents a reader of the lombard operation report that converts each line into an operation
  * Date: 2/7/22 - 22:27
  */
-class PatagoniaReportReader {
+class PatagoniaReportReader: OperationsReader {
     private val LINE_REGEX = """(\d\d/\d\d/\d\d\d\d) (RESCATE|SUSCRIPCION) (\d[\d.,]*) (\d+) (\d[\d.,]*) (.{1,3})""".toRegex()
     private val DECIMAL_FORMATTER = (NumberFormat.getInstance(Locale.GERMAN) as DecimalFormat)
         .also { formatter -> formatter.setParseBigDecimal(true) }
@@ -31,7 +31,7 @@ class PatagoniaReportReader {
 
     private val operations = mutableListOf<Operation>()
 
-    fun operations(): List<Operation> {
+    override fun operations(): List<Operation> {
         return operations.reversed() // File contains the newest first, we revert to do chronological order
     }
 
@@ -92,7 +92,7 @@ class PatagoniaReportReader {
         }
     }
 
-    fun addReportFile(reportFile: File): PatagoniaReportReader {
+    override fun addReportFile(reportFile: File): PatagoniaReportReader {
         val reportContent = Files.readString(reportFile.toPath())
         addReport(reportContent)
         return this

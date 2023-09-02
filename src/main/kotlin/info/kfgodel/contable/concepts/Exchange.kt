@@ -1,5 +1,6 @@
-package info.kfgodel.contable
+package info.kfgodel.contable.concepts
 
+import info.kfgodel.contable.of
 import info.kfgodel.contable.valued.ValuedAsset
 import java.math.BigDecimal
 
