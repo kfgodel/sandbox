@@ -1,7 +1,9 @@
 package info.kfgodel.contable.printer
 
+import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
-import info.kfgodel.contable.operations.OperationType
+import info.kfgodel.contable.operations.Operation
+import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.changeSymbolFor
 
 /**
@@ -11,32 +13,53 @@ import info.kfgodel.contable.valued.changeSymbolFor
 class ScreenPrinter(private val report: AccountantReport) {
   fun print() {
     println("* Año: ${report.year}");
+    val startingValuation = report.valuationAtStart();
     val endingValuation = report.valuationAtEnd();
+    println("Saldos iniciales:${startingValuation.balances()} y finales: ${endingValuation.balances()}")
 
-    val records = report.records();
+    val records = report.records()
     for (record in records) {
-      val tipoOperacion = when (record.operation.type) {
-        OperationType.TRANSFER -> "TRANSFERENCIA"
-        OperationType.WITHDRAW -> "RETIRO"
-        OperationType.DEPOSIT -> "DEPOSITO"
-        OperationType.COMISION -> "COMISION"
-        OperationType.INTEREST -> "INTERESES"
-        OperationType.SELL -> "VENTA"
-        OperationType.BUY -> "COMPRA"
-        else -> {
-          throw Error("Tipo de operacion no conocida: " + record.operation.type)
-        }
-      }
-      println("- ${record.operation.moment} $tipoOperacion ${record.operation.exchange.asset} @ ${record.operation.value()}")
+      printAsOperation(record)
       val operationChanges = record.changes
       for (change in operationChanges) {
-        println("\t- ${changeSymbolFor(change.value().amount)} ${change.value()} [${change.replaced().asset()} @ ${change.replacement().value()} contra ${change.replaced().value()} en ${change.replaced().moment}]")
+        printlnAsChange(change)
       }
     }
     val totalProfitOrLoss = endingValuation.totalProfitOrLoss()
     println("Resultado final: ${changeSymbolFor(totalProfitOrLoss.amount)} $totalProfitOrLoss")
 
-    val startingValuation = report.valuationAtStart();
-    println("Assets iniciales:${startingValuation.balances()} y finales: ${endingValuation.balances()}")
+  }
+
+  private fun printlnAsChange(change: ValueChange) {
+    val replaced = change.replaced()
+    val replacement = change.replacement()
+    println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset().amount} @ ${replacement.value().amount} desde ${replaced.value().amount} en ${replaced.moment}")
+  }
+
+  private fun printAsOperation(record: AccountantRecord) {
+    val operation = record.operation
+    val asset = operation.exchange.asset()
+    val value = operation.exchange.value()
+    println(buildString {
+      if (operation.mainAccount != Operation.UNDEFINED_ACCOUNT) {
+        append(operation.mainAccount)
+      }
+      append("- ")
+      append(operation.moment)
+      append(" ")
+      append(operation.type)
+      append(" ")
+      append(asset.unit)
+      append(" ")
+      append(asset.amount)
+      append(" @ ")
+      append(value.unit)
+      append(" ")
+      append(value.amount)
+      if (operation.externalAccount != Operation.UNDEFINED_ACCOUNT) {
+        append(" en ")
+        append(operation.externalAccount)
+      }
+    })
   }
 }
