@@ -35,7 +35,7 @@ data class Operation(
 
   override fun toString(): String {
     val usingAccount = mainAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " in $acc" }
-    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " with $acc" }
+    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
     return "$type $exchange on $moment$usingAccount$andAccount"
   }
 
