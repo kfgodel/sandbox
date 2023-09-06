@@ -18,7 +18,7 @@ data class Operation(
   fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
 
   override fun asset(): Magnitude {
-    return type.applySignTo(exchange.asset)
+    return exchange.asset
   }
 
   override fun value(): Magnitude {
@@ -34,8 +34,8 @@ data class Operation(
   }
 
   override fun toString(): String {
-    val usingAccount = mainAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
-    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " and $acc" }
+    val usingAccount = mainAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " in $acc" }
+    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " with $acc" }
     return "$type $exchange on $moment$usingAccount$andAccount"
   }
 
@@ -48,7 +48,10 @@ data class Operation(
   }
 
   fun splitBy(splitAmount: BigDecimal): Pair<Operation, Operation> {
-    val limitedAmount = splitAmount.min(exchange.asset.amount) // We cannot split what we don't have
+    var limitedAmount = splitAmount.min(exchange.asset().amount.abs()) // We cannot split what we don't have
+    if(exchange.asset().amount.signum() < 0){
+      limitedAmount = limitedAmount.negate()
+    }
     val splitOperation = Operation(type,exchange.proportionalto(limitedAmount),moment,mainAccount,externalAccount)
     val remainingAmount = exchange.asset().amount.minus(limitedAmount)
     val remainingOperation = Operation(type,exchange.proportionalto(remainingAmount),moment,mainAccount,externalAccount)

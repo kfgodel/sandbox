@@ -14,9 +14,9 @@ class ValueChange(private val previous: Operation, private val next: Operation) 
     }
 
     override fun value(): Magnitude {
-        val replacingValue = replacement().value() // Replacement always negates previous value signum
+        val replacingValue = replacement().value()
         val previousValue = replaced().value()
-        val valueDifference = replacingValue.minus(previousValue)
+        val valueDifference = replacingValue.sum(previousValue) // They have differente signum, that's why the diff
         return valueDifference
     }
 

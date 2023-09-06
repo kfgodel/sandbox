@@ -38,6 +38,7 @@ data class Magnitude(val amount: BigDecimal, val unit:String) {
   companion object {
         val ROUNDING = RoundingMode.HALF_EVEN
         val MATH_CTX = MathContext(16, ROUNDING)
+        val DECIMAL_SCALE = 5
     }
 }
 

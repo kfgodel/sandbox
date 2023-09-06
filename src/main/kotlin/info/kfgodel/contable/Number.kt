@@ -9,5 +9,5 @@ import java.math.RoundingMode
  * Date: 26/6/22 - 21:28
  */
 fun Number.of(assetName: String): Magnitude {
-    return Magnitude(BigDecimal(this.toString(), Magnitude.MATH_CTX).setScale(2, RoundingMode.HALF_EVEN), assetName)
+    return Magnitude(BigDecimal(this.toString(), Magnitude.MATH_CTX).setScale(Magnitude.DECIMAL_SCALE, RoundingMode.HALF_EVEN), assetName)
 }
