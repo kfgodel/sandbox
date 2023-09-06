@@ -51,16 +51,10 @@ class CryptoRecordReaderTest : KotlinSpec() {
         )
       }
 
-      it("can read operations from a buenbit file"){
-        val reportFile = File(this.javaClass.classLoader.getResource("buenbit.txt").file)
+      it("can read operations from the crypto file"){
+        val reportFile = File(this.javaClass.classLoader.getResource("crypto.txt").file)
         reader().addReportFile(reportFile)
-        assertThat(reader().operations()).hasSize(101)
-      }
-
-      it("can read operations from a satoshi file"){
-        val reportFile = File(this.javaClass.classLoader.getResource("satoshi.txt").file)
-        reader().addReportFile(reportFile)
-        assertThat(reader().operations()).hasSize(82)
+        assertThat(reader().operations()).hasSize(175)
       }
     }
   }

@@ -14,57 +14,56 @@ import java.util.TreeMap
  */
 class PortfolioValuation(val valueUnit: String) {
 
-    private val valuesPerAssetUnit = TreeMap<String, AssetBalance>()
-    private val profitAndLosses = mutableListOf<ValueChange>()
+  private val valuesPerAssetUnit = TreeMap<String, AssetBalance>()
+  private val profitAndLosses = mutableListOf<ValueChange>()
 
-    fun balances(): List<AssetBalance> {
-        return valuesPerAssetUnit.values.toList()
+  fun balances(): List<AssetBalance> {
+    return valuesPerAssetUnit.values.toList()
+  }
+
+  fun include(included: Operation): List<ValueChange> {
+    validate(included)
+    val includedAssetUnit = included.asset().unit
+    val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
+      AssetBalance(
+        assetUnit,
+        valueUnit
+      )
     }
+    val changes = assetBalance.updateWith(included)
+    considerProfitAndLossesDueTo(changes)
+    return changes
+  }
 
-    fun include(included: Operation): List<ValueChange> {
-        validate(included)
-        val includedAssetUnit = included.asset().unit
-        val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
-            AssetBalance(
-                assetUnit,
-                valueUnit
-            )
-        }
-        val changes = assetBalance.updateWith(included)
-        considerProfitAndLossesDueTo(changes)
-      return changes
+  private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
+    changes
+      .filter { change -> !change.isZero() } // Exclude changes that are not profit or losses
+      .forEach(profitAndLosses::add)
+  }
+
+  private fun validate(valued: ValuedAsset) {
+    val newUnit = valued.value().unit
+    if (newUnit != valueUnit) {
+      throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]")
     }
+  }
 
-    private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
-        changes
-            .filter { change -> !change.isZero() } // Exclude changes that are not profit or losses
-            .forEach(profitAndLosses::add)
+  fun removeProfitAndLosses() {
+    this.profitAndLosses.clear()
+  }
+
+  fun includeAll(operations: Iterable<Operation>): List<AccountantRecord> {
+    return operations.map { operation ->
+      val changes = this.include(operation)
+      AccountantRecord(operation, changes)
     }
+  }
 
-    private fun validate(valued: ValuedAsset) {
-        val newUnit = valued.value().unit
-        if(newUnit != valueUnit){
-            throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]")
-        }
-    }
+  fun totalProfitOrLoss(): Magnitude {
+    return profitAndLosses.fold(0.of(valueUnit)) { total, change -> total.sum(change.value()) }
+  }
 
-    fun profitAndLosses(): List<ValuedAsset> {
-        return profitAndLosses
-    }
-
-    fun removeProfitAndLosses() {
-        this.profitAndLosses.clear()
-    }
-
-    fun includeAll(operations: Iterable<Operation>): List<AccountantRecord> {
-      return operations.map { operation ->
-        val changes = this.include(operation)
-        AccountantRecord(operation, changes)
-      }
-    }
-
-    fun totalProfitOrLoss(): Magnitude {
-        return profitAndLosses.fold(0.of(valueUnit)) { total, change -> total.sum(change.value()) }
-    }
-
+  override fun toString(): String {
+    return "PortfolioValuation[${valueUnit}]: ${balances()}"
+  }
 }

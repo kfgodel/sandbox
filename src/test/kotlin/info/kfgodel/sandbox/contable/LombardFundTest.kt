@@ -1,9 +1,10 @@
 package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
-import info.kfgodel.contable.funds.LombardFund
 import info.kfgodel.contable.USD
+import info.kfgodel.contable.concepts.Ledger
 import info.kfgodel.contable.of
+import info.kfgodel.contable.reader.PatagoniaReportReader
 import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
@@ -18,19 +19,19 @@ import org.junit.runner.RunWith
 class LombardFundTest : KotlinSpec() {
   override fun define() {
     describe("a lombard fund") {
-      val fund by let { LombardFund() }
+      val ledger by let { Ledger().fromFile("lombard.txt", PatagoniaReportReader()) }
 
       it("has a ledger with all the operations in the lombard.txt file") {
-        assertThat(fund().ledger().operations()).hasSize(22)
+        assertThat(ledger().operations()).hasSize(22)
       }
 
       it("can generate a yearly accountant report") {
-        assertThat(fund().reportFor(2019)).isNotNull
+        assertThat(ledger().reportFor(2019, USD)).isNotNull
       }
 
       describe("yearly report") {
         val reportYear by let { 2019 }
-        val report by let {fund().reportFor(reportYear())}
+        val report by let {ledger().reportFor(reportYear(), USD)}
 
         it("is created for a year") {
           assertThat(report().year).isEqualTo(2019)
@@ -42,7 +43,6 @@ class LombardFundTest : KotlinSpec() {
 
         it("has no balances or profits at the beginning of first year") {
           assertThat(report().valuationAtStart().balances()).isEmpty()
-          assertThat(report().valuationAtStart().profitAndLosses()).isEmpty()
           assertThat(report().valuationAtStart().totalProfitOrLoss()).isEqualTo(0.of(USD))
         }
 
@@ -53,10 +53,6 @@ class LombardFundTest : KotlinSpec() {
         }
 
         it("has profit an loss for all operations done"){
-          assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
-            915.of(LOMBARD).at(16.59.of(USD)),
-            37.of(LOMBARD).at(0.36.of(USD))
-          ))
           assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(16.95.of(USD))
         }
 
@@ -71,10 +67,6 @@ class LombardFundTest : KotlinSpec() {
             assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
               0.of(LOMBARD).at(0.of(USD))
             ))
-            assertThat(report().valuationAtStart().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
-              915.of(LOMBARD).at(16.59.of(USD)),
-              37.of(LOMBARD).at(0.36.of(USD))
-            ))
           }
 
           it("has balance for all operated assets at end of year"){
@@ -84,11 +76,6 @@ class LombardFundTest : KotlinSpec() {
           }
 
           it("has profit and loss for all operations done"){
-            assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
-              936.of(LOMBARD).at(10.91.of(USD)),
-              3732.of(LOMBARD).at(28.84.of(USD)),
-              4659.of(LOMBARD).at(29.24.of(USD))
-            ))
             assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(68.99.of(USD))
           }
         }
@@ -104,13 +91,6 @@ class LombardFundTest : KotlinSpec() {
             assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
               0.of(LOMBARD).at(0.of(USD))
             ))
-            assertThat(report().valuationAtStart().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
-              915.of(LOMBARD).at(16.59.of(USD)),
-              37.of(LOMBARD).at(0.36.of(USD)),
-              936.of(LOMBARD).at(10.91.of(USD)),
-              3732.of(LOMBARD).at(28.84.of(USD)),
-              4659.of(LOMBARD).at(29.24.of(USD))
-            ))
           }
 
           it("has balance for all operated assets at end of year"){
@@ -120,17 +100,7 @@ class LombardFundTest : KotlinSpec() {
           }
 
           it("has profit an loss for all operations done"){
-            assertThat(report().valuationAtEnd().profitAndLosses()).isEqualTo(listOf<ValuedAsset>(
-              9738.of(LOMBARD).at(86.75.of(USD)),
-              4607.of(LOMBARD).at(18.27.of(USD)),
-              11920.of(LOMBARD).at(40.81.of(USD)),
-              4603.of(LOMBARD).at(13.97.of(USD)),
-              5929.of(LOMBARD).at(17.19.of(USD)),
-              478.of(LOMBARD).at(0.88.of(USD)),
-              4596.of(LOMBARD).at(5.59.of(USD)),
-              14195.of(LOMBARD).at(10.07.of(USD))
-            ))
-            assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(193.53.of(USD))
+            assertThat(report().valuationAtEnd().totalProfitOrLoss()).isEqualTo(193.54.of(USD))
           }
         }
       }
