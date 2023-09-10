@@ -14,25 +14,26 @@ import java.util.TreeMap
  */
 class PortfolioValuation(val valueUnit: String) {
 
-  private val valuesPerAssetUnit = TreeMap<String, AssetBalance>()
+  private val balancePerAsset = TreeMap<String, AssetBalance>()
   private val profitAndLosses = mutableListOf<ValueChange>()
 
   fun balances(): List<AssetBalance> {
-    return valuesPerAssetUnit.values.toList()
+    return balancePerAsset.values.toList()
   }
 
   fun include(included: Operation): List<ValueChange> {
     validate(included)
     val includedAssetUnit = included.asset().unit
-    val assetBalance = valuesPerAssetUnit.computeIfAbsent(includedAssetUnit) { assetUnit ->
-      AssetBalance(
-        assetUnit,
-        valueUnit
-      )
-    }
+    val assetBalance = getBalanceFor(includedAssetUnit)
     val changes = assetBalance.updateWith(included)
     considerProfitAndLossesDueTo(changes)
     return changes
+  }
+
+  private fun getBalanceFor(includedAssetUnit: String): AssetBalance {
+    return balancePerAsset.computeIfAbsent(includedAssetUnit) { assetUnit ->
+      AssetBalance(assetUnit, valueUnit)
+    }
   }
 
   private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
@@ -44,7 +45,7 @@ class PortfolioValuation(val valueUnit: String) {
   private fun validate(valued: ValuedAsset) {
     val newUnit = valued.value().unit
     if (newUnit != valueUnit) {
-      throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]")
+      throw UnsupportedOperationException("Include using a different value[$newUnit] than expected[$valueUnit]: $valued")
     }
   }
 

@@ -19,5 +19,9 @@ interface ValuedAsset{
     fun myHash(): Int {
         return Objects.hash(this.asset(), this.value())
     }
+
+  fun hasAsset(): Boolean {
+    return !asset().isZero()
+  }
 }
 

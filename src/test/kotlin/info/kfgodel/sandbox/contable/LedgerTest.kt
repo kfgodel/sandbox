@@ -1,12 +1,12 @@
 package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
-import info.kfgodel.contable.concepts.Ledger
 import info.kfgodel.contable.USD
-import info.kfgodel.contable.of
-import info.kfgodel.contable.on
+import info.kfgodel.contable.concepts.Ledger
 import info.kfgodel.contable.concepts.OperationType.BUY
 import info.kfgodel.contable.concepts.OperationType.SELL
+import info.kfgodel.contable.of
+import info.kfgodel.contable.on
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -48,7 +48,7 @@ class LedgerTest : KotlinSpec() {
 
             val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo(100.of(LOMBARD))
-            assertThat(valuedAsset.value()).isEqualTo(100.of(USD))
+            assertThat(valuedAsset.value()).isEqualTo((-100).of(USD))
           }
 
           it("deducts a sell of same asset from the valuation") {
@@ -57,7 +57,7 @@ class LedgerTest : KotlinSpec() {
 
             val valuedAsset = valuation().balances()[0]
             assertThat(valuedAsset.asset()).isEqualTo(50.of(LOMBARD))
-            assertThat(valuedAsset.value()).isEqualTo(50.of(USD))
+            assertThat(valuedAsset.value()).isEqualTo((-50).of(USD))
           }
 
           describe("for a second time") {
@@ -70,7 +70,7 @@ class LedgerTest : KotlinSpec() {
 
               val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo(150.of(LOMBARD))
-              assertThat(valuedAsset.value()).isEqualTo(200.of(USD))
+              assertThat(valuedAsset.value()).isEqualTo((-200).of(USD))
             }
 
             it("deducts a sell from the oldest buy") {
@@ -79,7 +79,7 @@ class LedgerTest : KotlinSpec() {
 
               val valuedAsset = valuation().balances()[0]
               assertThat(valuedAsset.asset()).isEqualTo(100.of(LOMBARD))
-              assertThat(valuedAsset.value()).isEqualTo(150.of(USD))
+              assertThat(valuedAsset.value()).isEqualTo((-150).of(USD))
             }
           }
         }

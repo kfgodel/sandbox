@@ -2,10 +2,10 @@ package info.kfgodel.sandbox.contable
 
 import info.kfgodel.contable.LOMBARD
 import info.kfgodel.contable.USD
-import info.kfgodel.contable.of
-import info.kfgodel.contable.on
 import info.kfgodel.contable.concepts.OperationType.BUY
 import info.kfgodel.contable.concepts.OperationType.SELL
+import info.kfgodel.contable.of
+import info.kfgodel.contable.on
 import info.kfgodel.contable.reader.PatagoniaReportReader
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec

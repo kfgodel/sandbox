@@ -32,7 +32,7 @@ class CryptoRecordReaderTest : KotlinSpec() {
       it("can read an operation from a single report line"){
         reader().addReport("Buenbit\t2020-05-12\tCOMPRA\tDAI\t393.7\tARS\t-49999.9\t")
         assertThat(reader().operations()).containsExactly(
-          BUY.done(on(12,5,2020), 393.7.of(DAI).at((-49999.9).of(ARS))).using("BuenBit")
+          BUY.done(on(12,5,2020), 393.7.of(DAI).at(49999.9.of(ARS))).using("BuenBit")
         )
       }
 

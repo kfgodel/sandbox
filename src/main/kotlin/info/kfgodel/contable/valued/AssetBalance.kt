@@ -1,8 +1,9 @@
 package info.kfgodel.contable.valued
 
+import info.kfgodel.contable.calculator.ChangeCalculator
 import info.kfgodel.contable.concepts.Magnitude
-import info.kfgodel.contable.of
 import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.of
 import java.util.LinkedList
 
 /**
@@ -11,7 +12,7 @@ import java.util.LinkedList
  * Date: 30/7/22 - 14:35
  */
 class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
-    private val operations: LinkedList<Operation> = LinkedList()
+    private var operations: List<Operation> = LinkedList()
 
     fun valuables(): List<Operation> {
         return operations
@@ -37,35 +38,10 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
 
     fun updateWith(newOperation: Operation) : List<ValueChange> {
       validateUpdatedAsset(newOperation)
-      val changes = mutableListOf<ValueChange>()
-      var currentOperation = newOperation
-      while (!currentOperation.asset().isZero() && operations.isNotEmpty()){ // While we have an amount to update and values to consume
-        val oldestOperation = operations.removeFirst()
-        val oldestAsset = oldestOperation.asset()
-        val currentAsset = currentOperation.asset()
-        if(currentAsset.hasSameSignumAs(oldestAsset)){
-          // Both operations go in the same direction without consuming each other. We keep both
-          val (consumed, zero) = currentOperation.splitBy(currentAsset.amount.abs())
-          operations.addFirst(oldestOperation)
-          operations.addLast(consumed)
-          currentOperation = zero // nothing left to distribute
-        }else{
-          // One operation cancels the other total or partially. We have a value change
-          val (consumedOldest, remainingOldest) = oldestOperation.splitBy(currentAsset.amount.abs())
-          val (consumedCurrent, remainingCurrent) = currentOperation.splitBy(oldestAsset.amount.abs())
-          changes.add(ValueChange(consumedOldest, consumedCurrent))
-          if(!remainingOldest.asset().isZero()){
-            // The oldest operation still has remaining value to use in next update
-            operations.addFirst(remainingOldest)
-          }
-          currentOperation = remainingCurrent
-        }
-      }
-      if(!currentOperation.asset().isZero()){
-          // We still have an amount to update after consuming all pre-existing values. This changes balance signum
-          operations.addFirst(currentOperation)
-      }
-      return changes
+      val result = ChangeCalculator(operations)
+        .calculateFor(newOperation)
+      this.operations = result.remainingOperations()
+      return result.changes()
     }
 
     private fun validateUpdatedAsset(valued: ValuedAsset) {
