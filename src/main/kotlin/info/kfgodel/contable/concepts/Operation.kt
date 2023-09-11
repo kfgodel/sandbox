@@ -58,6 +58,10 @@ data class Operation(
     return Pair(splitOperation, remainingOperation)
   }
 
+  fun counterpart(): Operation {
+    return Operation(type, exchange.inverse(), moment, mainAccount, externalAccount)
+  }
+
   companion object {
     const val UNDEFINED_ACCOUNT = "UNDEFINED"
   }

@@ -2,6 +2,7 @@ package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.concepts.Magnitude
 import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.of
 import java.math.BigDecimal
 
 /**
@@ -16,6 +17,10 @@ class ValueChange(private val previous: Operation, private val next: Operation) 
     override fun value(): Magnitude {
         val replacingValue = replacement().value()
         val previousValue = replaced().value()
+      if(replacingValue.unit != previousValue.unit){
+        // If we have different currencies there's no loss or gain, just exchange
+        return 0.of(replacingValue.unit)
+      }
         val valueDifference = replacingValue.sum(previousValue) // They have differente signum, that's why the diff
         return valueDifference
     }

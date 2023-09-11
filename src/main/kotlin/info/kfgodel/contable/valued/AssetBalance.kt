@@ -37,22 +37,10 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
     }
 
     fun updateWith(newOperation: Operation) : List<ValueChange> {
-      validateUpdatedAsset(newOperation)
       val result = ChangeCalculator(operations)
         .calculateFor(newOperation)
       this.operations = result.remainingOperations()
       return result.changes()
-    }
-
-    private fun validateUpdatedAsset(valued: ValuedAsset) {
-        val updatedAssetUnit = valued.asset().unit
-        if (updatedAssetUnit != assetUnit) {
-            throw UnsupportedOperationException("Update using a different asset[${updatedAssetUnit}] than expected[${assetUnit}]")
-        }
-        val updatedValueUnit = valued.value().unit
-        if (updatedValueUnit != valueUnit) {
-            throw UnsupportedOperationException("Update using a different value[${updatedValueUnit}] than expected[${valueUnit}]")
-        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -64,7 +52,7 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
     }
 
     override fun toString(): String {
-        return "${asset()} @ ${value()} from ${operations.size} values"
+        return "${asset()} @ ${value()} (${operations.size} ops)"
     }
 
 

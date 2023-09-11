@@ -2,6 +2,7 @@ package info.kfgodel.contable.accountant
 
 import info.kfgodel.contable.concepts.Magnitude
 import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.concepts.OperationType
 import info.kfgodel.contable.of
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
@@ -19,15 +20,41 @@ class PortfolioValuation(val valueUnit: String) {
 
   fun balances(): List<AssetBalance> {
     return balancePerAsset.values.toList()
+      .filter { balance -> balance.hasAsset() || !balance.value().isZero() }
   }
 
   fun include(included: Operation): List<ValueChange> {
-    validate(included)
-    val includedAssetUnit = included.asset().unit
+//    validate(included)
+    var currentOp = included
+    if(currentOp.value().unit != valueUnit && currentOp.value().amount.signum() < 0){
+      // It's an expense in other currency, let's invert the operation to operate over the currency itself
+      currentOp = currentOp.counterpart()
+    }
+    val includedAssetUnit = currentOp.asset().unit
     val assetBalance = getBalanceFor(includedAssetUnit)
-    val changes = assetBalance.updateWith(included)
-    considerProfitAndLossesDueTo(changes)
-    return changes
+    val assetChanges = assetBalance.updateWith(currentOp)
+    considerProfitAndLossesDueTo(assetChanges)
+
+    val valueOperations = calculateValueOperations(currentOp, assetChanges)
+      .filter { operation -> operation.hasAsset() }
+    valueOperations.forEach { valueOperation ->
+      val valueBalance = getBalanceFor(valueOperation.asset().unit)
+      val valueChanges = valueBalance.updateWith(valueOperation)
+    }
+    return assetChanges
+  }
+
+  private fun calculateValueOperations(included: Operation, assetChanges: List<ValueChange>): List<Operation> {
+    val includedValueUnit = included.value().unit
+    if(includedValueUnit == valueUnit || assetChanges.isEmpty()){
+      // Operation uses same currency as this portfolio, use the value as is
+      return mutableListOf(included.counterpart())
+    }
+    // There's an implicit currency conversion operation per change, we need to create a relationship
+    // between new currency and old value
+    return assetChanges.map { change ->
+      Operation(OperationType.BUY, change.replacement().value().at(change.replaced().value()),change.replacement().moment, change.replacement().mainAccount, change.replacement().externalAccount)
+    }
   }
 
   private fun getBalanceFor(includedAssetUnit: String): AssetBalance {
@@ -64,7 +91,16 @@ class PortfolioValuation(val valueUnit: String) {
     return profitAndLosses.fold(0.of(valueUnit)) { total, change -> total.sum(change.value()) }
   }
 
+  fun totalValue(): Magnitude {
+    var total = 0.of(valueUnit)
+    balances().forEach { balance ->
+      val valueToSum = if(balance.asset().unit == valueUnit) balance.asset() else balance.value().negative()
+      total = total.sum(valueToSum)
+    }
+    return total
+  }
+
   override fun toString(): String {
-    return "PortfolioValuation[${valueUnit}]: ${balances()}"
+    return "PortfolioValuation[${totalValue()}]: ${balances()}"
   }
 }

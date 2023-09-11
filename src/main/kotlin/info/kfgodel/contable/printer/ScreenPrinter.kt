@@ -15,7 +15,7 @@ class ScreenPrinter(private val report: AccountantReport) {
     println("* Año: ${report.year}");
     val startingValuation = report.valuationAtStart();
     val endingValuation = report.valuationAtEnd();
-    println("Saldos iniciales:${startingValuation.balances()} y finales: ${endingValuation.balances()}")
+    println("Saldos iniciales: ${startingValuation.totalValue()} - ${startingValuation.balances()} y finales: ${endingValuation.totalValue()} - ${endingValuation.balances()}")
 
     val records = report.records()
     for (record in records) {
@@ -33,7 +33,7 @@ class ScreenPrinter(private val report: AccountantReport) {
   private fun printlnAsChange(change: ValueChange) {
     val replaced = change.replaced()
     val replacement = change.replacement()
-    println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset().amount} @ ${replacement.value().amount} desde ${replaced.value().amount} en ${replaced.moment}")
+    println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset()} @ ${replacement.value()} desde ${replaced.value()} en ${replaced.moment}")
   }
 
   private fun printAsOperation(record: AccountantRecord) {

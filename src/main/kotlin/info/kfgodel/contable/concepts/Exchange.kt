@@ -26,4 +26,8 @@ data class Exchange(val asset: Magnitude, val price: Magnitude) : ValuedAsset {
       .divide(asset().amount, Magnitude.MATH_CTX)
     return newAssetAmount.of(asset().unit).at(newValueAmount.of(value().unit))
   }
+
+  fun inverse(): Exchange {
+    return value().at(asset())
+  }
 }
