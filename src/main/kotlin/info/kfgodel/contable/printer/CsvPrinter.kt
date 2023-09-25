@@ -4,6 +4,7 @@ import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
 import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.concepts.OperationType
+import info.kfgodel.contable.toISODate
 import info.kfgodel.contable.valued.AssetBalance
 import info.kfgodel.contable.valued.ValueChange
 
@@ -18,7 +19,7 @@ class CsvPrinter(private val report: AccountantReport)  {
     println("Saldos iniciales:\t" + asCsvBalances(startingValuation.balances()))
     val endingValuation = report.valuationAtEnd()
     println("Saldos finales:\t" + asCsvBalances(endingValuation.balances()))
-    println(asCsvRow(listOf("Wallet","Operado en","Tipo","Asset","Cantidad","Moneda","Importe","Cuenta externa","Parte","Precio original","Precio posterior","Dif Precio","Fecha original")))
+    println(asCsvRow(listOf("Wallet","Operado en","Tipo","Asset","Cantidad","Moneda","Importe","Cuenta externa","Parte","Precio original","Precio operado","Dif Precio","Fecha original")))
 
     val records = report.records()
     for (record in records) {
@@ -36,7 +37,7 @@ class CsvPrinter(private val report: AccountantReport)  {
       // Wallet
       "",
       // Operado en
-      change.replacement().moment.toString(),
+      change.replacement().moment.toISODate(),
       // Tipo
       "\\",
       // Asset
@@ -58,7 +59,7 @@ class CsvPrinter(private val report: AccountantReport)  {
       // Dif Precio
       change.value().amount.toString(),
       // Fecha original
-      change.replaced().moment.toString(),
+      change.replaced().moment.toISODate(),
     )
     )
   }
@@ -81,7 +82,7 @@ class CsvPrinter(private val report: AccountantReport)  {
       // Wallet
       asAccountName(operation.mainAccount),
       // Operado en
-      operation.moment.toString(),
+      operation.moment.toISODate(),
       // Tipo
       tipoOperacion,
       // Asset

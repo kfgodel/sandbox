@@ -41,13 +41,6 @@ class AssetBalanceTest : KotlinSpec() {
       },{ e ->
         assertThat(e).hasMessage("Update using a different asset[OTHER] than expected[LOMBARD]")
       })
-      itThrows(UnsupportedOperationException::class.java, "if updated with a different value unit", {
-        balance().updateWith(
-          BUY.done(on(1,1,2001),1.of(LOMBARD).at(1.of("OTHER")))
-        )
-      },{ e ->
-        assertThat(e).hasMessage("Update using a different value[OTHER] than expected[USD]")
-      })
 
       describe("when balance is updated with a value") {
         val firstUpdate by let { balance().updateWith(

@@ -37,11 +37,19 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
     }
 
     fun updateWith(newOperation: Operation) : List<ValueChange> {
+      validateSameAsset(newOperation)
       val result = ChangeCalculator(operations)
         .calculateFor(newOperation)
       this.operations = result.remainingOperations()
       return result.changes()
     }
+
+  private fun validateSameAsset(newOperation: Operation) {
+    val newUnit = newOperation.asset().unit
+    if(newUnit != assetUnit){
+      throw UnsupportedOperationException("Update using a different asset[${newUnit}] than expected[${assetUnit}]")
+    }
+  }
 
     override fun equals(other: Any?): Boolean {
         return this.isEqualTo(other)
