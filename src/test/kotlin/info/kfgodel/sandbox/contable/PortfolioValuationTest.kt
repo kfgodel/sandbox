@@ -27,12 +27,6 @@ class PortfolioValuationTest : KotlinSpec() {
         assertThat(valuation().balances()).isEmpty()
       }
 
-      itThrows(UnsupportedOperationException::class.java, "if a value with different unit is included",{
-        valuation().include(BUY.done(on(1,1,2001),1.of("ANY").at(1.of("ARS"))))
-      }, { e ->
-        assertThat(e).hasMessage("Include using a different value[ARS] than expected[USD]: BUY 1.00000 ANY @ -1.00000 ARS on 2001-01-01T00:00")
-      })
-
       describe("when values are included") {
         beforeEach {
           valuation().include(

@@ -46,9 +46,9 @@ class LombardFundTest : KotlinSpec() {
           assertThat(report().valuationAtStart().totalProfitOrLoss()).isEqualTo(0.of(USD))
         }
 
-        it("has balance for all operated assets at end of year"){
+        it("has balance for all operated assets at end of year including profit balances"){
           assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
-            0.of(LOMBARD).at(0.of(USD))
+            16.95.of(USD).at((-16.00281).of(LOMBARD)) // We won 16 USD equivalent to over selling 16 Lombard
           ))
         }
 
@@ -65,13 +65,13 @@ class LombardFundTest : KotlinSpec() {
 
           it("has previous balances and profits at the beginning of first year") {
             assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
-              0.of(LOMBARD).at(0.of(USD))
+              16.95.of(USD).at((-16.00281).of(LOMBARD))
             ))
           }
 
           it("has balance for all operated assets at end of year"){
             assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
-              0.of(LOMBARD).at(0.of(USD))
+              85.94.of(USD).at((-79.61952).of(LOMBARD)) // Accumulated profits
             ))
           }
 
@@ -89,13 +89,13 @@ class LombardFundTest : KotlinSpec() {
 
           it("has previous balances and profits at the beginning of first year") {
             assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
-              0.of(LOMBARD).at(0.of(USD))
+              85.94.of(USD).at((-79.61952).of(LOMBARD))
             ))
           }
 
           it("has balance for all operated assets at end of year"){
             assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
-              0.of(LOMBARD).at(0.of(USD))
+              279.48.of(USD).at((-256.62405).of(LOMBARD)) // 3 years of profit
             ))
           }
 
