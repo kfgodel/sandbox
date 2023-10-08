@@ -75,7 +75,7 @@ class PortfolioValuation(val valueUnit: String) {
   fun includeAll(operations: Iterable<Operation>): List<AccountantRecord> {
     return operations.map { operation ->
       val changes = this.include(operation)
-      AccountantRecord(operation, changes)
+      AccountantRecord(operation, changes, totalValue())
     }
   }
 

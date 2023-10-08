@@ -1,5 +1,6 @@
 package info.kfgodel.contable.concepts
 
+import info.kfgodel.contable.calculator.Something
 import info.kfgodel.contable.valued.ValuedAsset
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -14,7 +15,7 @@ data class Operation(
   val moment: LocalDateTime,
   val mainAccount: String = UNDEFINED_ACCOUNT,
   val externalAccount: String = UNDEFINED_ACCOUNT
-) : ValuedAsset {
+) : ValuedAsset, Something {
   fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
 
   override fun asset(): Magnitude {
