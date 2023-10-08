@@ -7,9 +7,19 @@ import java.util.LinkedList
 /**
  * This type represents the result of calculating the impact of one operation over others
  */
-class CalculationResult(startingOperations: List<Operation>) {
+class AssetVariation(val startingOperations: List<Operation>, val modifyingOperation: Operation) {
   private val remainingOperations = LinkedList(startingOperations)
   private val changes = mutableListOf<ValueChange>()
+  private val addedOperations = mutableListOf<Operation>()
+  private val reducedOperations = mutableListOf<Operation>()
+
+  fun addedOperations(): List<Operation> {
+    return addedOperations;
+  }
+  fun reducedOperations(): List<Operation> {
+    return reducedOperations;
+  }
+
   /**
    * State of original operations after the impact. It may result in the loss, gain or any combination of those
    */
@@ -20,7 +30,7 @@ class CalculationResult(startingOperations: List<Operation>) {
   /**
    * List of changes in the value of original operations after the impact of the new
    */
-  fun changes(): List<ValueChange> {
+  fun valueChanges(): List<ValueChange> {
     return changes
   }
 
@@ -42,6 +52,14 @@ class CalculationResult(startingOperations: List<Operation>) {
 
   fun recordChange(consumedOldest: Operation, consumedCurrent: Operation) {
     changes.add(ValueChange(consumedOldest, consumedCurrent))
+  }
+
+  fun addOperation(addedOperation: Operation) {
+    addedOperations.add(addedOperation)
+  }
+
+  fun reduceOperation(reducedOperation: Operation) {
+    reducedOperations.add(reducedOperation)
   }
 
 }

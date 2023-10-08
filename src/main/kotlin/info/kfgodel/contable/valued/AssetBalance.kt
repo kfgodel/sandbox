@@ -41,7 +41,7 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
       val result = ChangeCalculator(operations)
         .calculateFor(newOperation)
       this.operations = result.remainingOperations()
-      return result.changes()
+      return result.valueChanges()
     }
 
   private fun validateSameAsset(newOperation: Operation) {

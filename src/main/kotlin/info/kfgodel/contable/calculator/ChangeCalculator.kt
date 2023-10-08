@@ -14,9 +14,10 @@ class ChangeCalculator(private val inputOperations: List<Operation>) {
    * This may reduce assets, increase it, revert it, or no effect at all.
    * Any value change is recorded in the result
    */
-  fun calculateFor(newOperation: Operation): CalculationResult {
-    validateSameAsset(inputOperations, newOperation)
-    val result = CalculationResult(inputOperations)
+  fun calculateFor(newOperation: Operation): AssetVariation {
+    validateSameAsset(inputOperations, newOperation) // Sanity check to prevent mixing asset types
+
+    val result = AssetVariation(inputOperations, newOperation)
     var currentOperation = newOperation
     while (currentOperation.hasAsset() && result.hasRemainingAsset()){ // We still have assets to calculate on both ends
       val oldestOperation = result.removeOldest()
@@ -27,14 +28,19 @@ class ChangeCalculator(private val inputOperations: List<Operation>) {
         val (consumed, zero) = currentOperation.splitBy(currentAsset.amount.abs())
         result.keepAsOldest(oldestOperation)
         result.keepAsNewest(consumed)
+        result.addOperation(currentOperation)
         currentOperation = zero // nothing left to distribute
       }else{
-        // One operation cancels the other total or partially. We have a value change
+        // One operation reduces the other total or partially. We have a potential value change as well
         val (consumedOldest, remainingOldest) = oldestOperation.splitBy(currentAsset.amount.abs())
         val (consumedCurrent, remainingCurrent) = currentOperation.splitBy(oldestAsset.amount.abs())
         result.recordChange(consumedOldest, consumedCurrent)
-        if(!remainingOldest.asset().isZero()){
-          // The oldest operation still has remaining value to use in next update
+        if(consumedOldest.hasAsset()){
+          // Some of the asset has been reduced
+          result.reduceOperation(consumedOldest)
+        }
+        if(remainingOldest.hasAsset()){
+          // The oldest operation still has remaining value to use in next loop
           result.keepAsOldest(remainingOldest)
         }
         currentOperation = remainingCurrent
@@ -43,6 +49,7 @@ class ChangeCalculator(private val inputOperations: List<Operation>) {
     if(currentOperation.hasAsset()){
       // We still have an amount to update after consuming all pre-existing values. This changes balance signum
       result.keepAsOldest(currentOperation)
+      result.addOperation(currentOperation)
     }
     return result
   }
