@@ -1,6 +1,6 @@
 package info.kfgodel.contable.calculator
 
-import info.kfgodel.contable.concepts.Operation
+import info.kfgodel.contable.valued.ValuedAsset
 
 /**
  * Thius type represents a change calculator that given operations for some asset calculates the value changes
@@ -8,13 +8,13 @@ import info.kfgodel.contable.concepts.Operation
  *
  * Date: 10/9/23 - 16:21
  */
-class ChangeCalculator(private val inputOperations: List<Operation>) {
+class ChangeCalculator<S: ValuedAsset<S>>(private val inputOperations: List<S>) {
   /**
    * Calculates the effect of combining a new operation with the existing when creating the calculator.
    * This may reduce assets, increase it, revert it, or no effect at all.
    * Any value change is recorded in the result
    */
-  fun calculateFor(newOperation: Operation): AssetVariation {
+  fun calculateFor(newOperation: S): AssetVariation<S> {
     validateSameAsset(inputOperations, newOperation) // Sanity check to prevent mixing asset types
 
     val result = AssetVariation(inputOperations, newOperation)
@@ -57,7 +57,7 @@ class ChangeCalculator(private val inputOperations: List<Operation>) {
   /**
    * Validates that the input operations have the same type of asset than the new operation before doing calculations
    */
-  private fun validateSameAsset(inputOperations: List<Operation>, newOperation: Operation) {
+  private fun validateSameAsset(inputOperations: List<ValuedAsset<S>>, newOperation: S) {
     val differentAsset = inputOperations.find { input -> input.asset().unit != newOperation.asset().unit }
     if (differentAsset != null) {
       throw UnsupportedOperationException("We cannot mix assets new[${newOperation.asset().unit}] and old[${differentAsset.asset().unit}]. New: $newOperation, Old: $differentAsset")

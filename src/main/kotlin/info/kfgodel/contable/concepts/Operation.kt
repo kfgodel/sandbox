@@ -1,7 +1,8 @@
 package info.kfgodel.contable.concepts
 
-import info.kfgodel.contable.calculator.Something
 import info.kfgodel.contable.valued.ValuedAsset
+import info.kfgodel.contable.valued.hashOf
+import info.kfgodel.contable.valued.isEqualTo
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
@@ -15,7 +16,7 @@ data class Operation(
   val moment: LocalDateTime,
   val mainAccount: String = UNDEFINED_ACCOUNT,
   val externalAccount: String = UNDEFINED_ACCOUNT
-) : ValuedAsset, Something {
+) : ValuedAsset<Operation> {
   fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
 
   override fun asset(): Magnitude {
@@ -27,16 +28,16 @@ data class Operation(
   }
 
   override fun equals(other: Any?): Boolean {
-    return this.isEqualTo(other)
+    return isEqualTo(other, asset(), value())
   }
 
   override fun hashCode(): Int {
-    return this.myHash()
+    return hashOf(asset(), value())
   }
 
   override fun toString(): String {
-    val usingAccount = mainAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " in $acc" }
-    val andAccount = externalAccount.let { acc -> if(acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
+    val usingAccount = mainAccount.let { acc -> if (acc == UNDEFINED_ACCOUNT) "" else " in $acc" }
+    val andAccount = externalAccount.let { acc -> if (acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
     return "$type $exchange on $moment$usingAccount$andAccount"
   }
 
@@ -48,14 +49,15 @@ data class Operation(
     return Operation(type, exchange, moment, mainAccount, accountName)
   }
 
-  fun splitBy(splitAmount: BigDecimal): Pair<Operation, Operation> {
+  override fun splitBy(splitAmount: BigDecimal): Pair<Operation, Operation> {
     var limitedAmount = splitAmount.min(exchange.asset().amount.abs()) // We cannot split what we don't have
-    if(exchange.asset().amount.signum() < 0){
+    if (exchange.asset().amount.signum() < 0) {
       limitedAmount = limitedAmount.negate()
     }
-    val splitOperation = Operation(type,exchange.proportionalto(limitedAmount),moment,mainAccount,externalAccount)
+    val splitOperation = Operation(type, exchange.proportionalto(limitedAmount), moment, mainAccount, externalAccount)
     val remainingAmount = exchange.asset().amount.minus(limitedAmount)
-    val remainingOperation = Operation(type,exchange.proportionalto(remainingAmount),moment,mainAccount,externalAccount)
+    val remainingOperation =
+      Operation(type, exchange.proportionalto(remainingAmount), moment, mainAccount, externalAccount)
     return Pair(splitOperation, remainingOperation)
   }
 

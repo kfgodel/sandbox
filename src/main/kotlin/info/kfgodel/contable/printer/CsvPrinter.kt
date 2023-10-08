@@ -50,7 +50,7 @@ class CsvPrinter(private val report: AccountantReport) {
     }
   }
 
-  private fun asCsvPart(change: ValueChange): String {
+  private fun asCsvPart(change: ValueChange<Operation>): String {
     return asCsvRow(
       listOf(
         // Wallet

@@ -11,32 +11,32 @@ import java.util.LinkedList
  *
  * Date: 30/7/22 - 14:35
  */
-class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
+class AssetBalance(val assetUnit:String, val valueUnit:String){
     private var operations: List<Operation> = LinkedList()
 
     fun valuables(): List<Operation> {
         return operations
     }
 
-    override fun asset(): Magnitude {
+    fun asset(): Magnitude {
         if(operations.isEmpty()){
             return 0.of(assetUnit)
         }
         return operations
-            .map(ValuedAsset::asset)
-            .reduce(Magnitude::sum)
+            .map { it.asset() }
+          .reduce(Magnitude::sum)
     }
 
-    override fun value(): Magnitude {
+    fun value(): Magnitude {
         if(operations.isEmpty()){
             return 0.of(valueUnit)
         }
         return operations
-            .map(ValuedAsset::value)
-            .reduce(Magnitude::sum)
+            .map { it.value() }
+          .reduce(Magnitude::sum)
     }
 
-    fun updateWith(newOperation: Operation) : List<ValueChange> {
+    fun updateWith(newOperation: Operation) : List<ValueChange<Operation>> {
       validateSameAsset(newOperation)
       val result = ChangeCalculator(operations)
         .calculateFor(newOperation)
@@ -52,11 +52,11 @@ class AssetBalance(val assetUnit:String, val valueUnit:String): ValuedAsset {
   }
 
     override fun equals(other: Any?): Boolean {
-        return this.isEqualTo(other)
+        return isEqualTo(other, asset(), value())
     }
 
     override fun hashCode(): Int {
-        return this.myHash()
+        return hashOf(asset(), value())
     }
 
     override fun toString(): String {

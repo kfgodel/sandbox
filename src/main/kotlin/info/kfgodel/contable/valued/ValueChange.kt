@@ -1,7 +1,6 @@
 package info.kfgodel.contable.valued
 
 import info.kfgodel.contable.concepts.Magnitude
-import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.of
 import java.math.BigDecimal
 
@@ -9,12 +8,12 @@ import java.math.BigDecimal
  * This class represents a change in the value of assets
  * Date: 31/7/22 - 12:14
  */
-class ValueChange(private val previous: Operation, private val next: Operation) : ValuedAsset {
-    override fun asset(): Magnitude {
+class ValueChange<S:ValuedAsset<S>>(private val previous: S, private val next: S) {
+    fun asset(): Magnitude {
         return previous.asset()
     }
 
-    override fun value(): Magnitude {
+    fun value(): Magnitude {
         val replacingValue = replacement().value()
         val previousValue = replaced().value()
       if(replacingValue.unit != previousValue.unit){
@@ -25,20 +24,20 @@ class ValueChange(private val previous: Operation, private val next: Operation) 
         return valueDifference
     }
 
-    fun replaced(): Operation {
+    fun replaced(): S {
         return previous
     }
 
-    fun replacement(): Operation {
+    fun replacement(): S {
       return next
     }
 
     override fun equals(other: Any?): Boolean {
-        return this.isEqualTo(other)
+        return isEqualTo(other, asset(), value())
     }
 
     override fun hashCode(): Int {
-        return this.myHash()
+        return hashOf(asset(), value())
     }
 
     override fun toString(): String {

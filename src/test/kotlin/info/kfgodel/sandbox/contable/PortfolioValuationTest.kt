@@ -43,7 +43,7 @@ class PortfolioValuationTest : KotlinSpec() {
         describe("balances") {
 
           it("are calculated per each asset") {
-            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(valuation().balances()).isEqualTo(listOf(
               200.of(LOMBARD).at((-300).of(USD)),
               10.of("OTHER").at((-10).of(USD))
             ))
@@ -54,7 +54,7 @@ class PortfolioValuationTest : KotlinSpec() {
             valuation().include(BUY.done(on(1,1,2001),10.of("OTHER").at(50.of(USD))))
             valuation().include(SELL.done(on(1,1,2001),10.of("OTHER").at(50.of(USD))))
 
-            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(valuation().balances()).isEqualTo(listOf(
               50.of(LOMBARD).at((-100).of(USD)),
               10.of("OTHER").at((-50).of(USD))
             ))
@@ -93,7 +93,7 @@ class PortfolioValuationTest : KotlinSpec() {
             valuation().removeProfitAndLosses()
 
             assertThat(valuation().totalProfitOrLoss()).isEqualTo(0.of(USD))
-            assertThat(valuation().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(valuation().balances()).isEqualTo(listOf(
               50.of(LOMBARD).at((-100).of(USD)),
               10.of("OTHER").at((-10).of(USD))
             ))

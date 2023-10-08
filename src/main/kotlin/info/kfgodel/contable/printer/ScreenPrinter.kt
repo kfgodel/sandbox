@@ -30,7 +30,7 @@ class ScreenPrinter(private val report: AccountantReport) {
 
   }
 
-  private fun printlnAsChange(change: ValueChange) {
+  private fun printlnAsChange(change: ValueChange<Operation>) {
     val replaced = change.replaced()
     val replacement = change.replacement()
     println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset()} @ ${replacement.value()} desde ${replaced.value()} en ${replaced.moment}")

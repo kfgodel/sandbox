@@ -5,7 +5,6 @@ import info.kfgodel.contable.USD
 import info.kfgodel.contable.concepts.Ledger
 import info.kfgodel.contable.of
 import info.kfgodel.contable.reader.PatagoniaReportReader
-import info.kfgodel.contable.valued.ValuedAsset
 import info.kfgodel.jspek.api.JavaSpecRunner
 import info.kfgodel.jspek.api.KotlinSpec
 import org.assertj.core.api.Assertions.assertThat
@@ -47,7 +46,7 @@ class LombardFundTest : KotlinSpec() {
         }
 
         it("has balance for all operated assets at end of year including profit balances"){
-          assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+          assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf(
             16.95.of(USD).at((-16.00281).of(LOMBARD)) // We won 16 USD equivalent to over selling 16 Lombard
           ))
         }
@@ -64,13 +63,13 @@ class LombardFundTest : KotlinSpec() {
           }
 
           it("has previous balances and profits at the beginning of first year") {
-            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf(
               16.95.of(USD).at((-16.00281).of(LOMBARD))
             ))
           }
 
           it("has balance for all operated assets at end of year"){
-            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf(
               85.94.of(USD).at((-79.61952).of(LOMBARD)) // Accumulated profits
             ))
           }
@@ -88,13 +87,13 @@ class LombardFundTest : KotlinSpec() {
           }
 
           it("has previous balances and profits at the beginning of first year") {
-            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(report().valuationAtStart().balances()).isEqualTo(listOf(
               85.94.of(USD).at((-79.61952).of(LOMBARD))
             ))
           }
 
           it("has balance for all operated assets at end of year"){
-            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf<ValuedAsset>(
+            assertThat(report().valuationAtEnd().balances()).isEqualTo(listOf(
               279.48.of(USD).at((-256.62405).of(LOMBARD)) // 3 years of profit
             ))
           }

@@ -15,14 +15,14 @@ import java.util.TreeMap
 class PortfolioValuation(val valueUnit: String) {
 
   private val balancePerAsset = TreeMap<String, AssetBalance>()
-  private val profitAndLosses = mutableListOf<ValueChange>()
+  private val profitAndLosses = mutableListOf<ValueChange<Operation>>()
 
   fun balances(): List<AssetBalance> {
     return balancePerAsset.values.toList()
-      .filter { balance -> balance.hasAsset() || !balance.value().isZero() }
+      .filter { balance -> !balance.asset().isZero() || !balance.value().isZero() }
   }
 
-  fun include(included: Operation): List<ValueChange> {
+  fun include(included: Operation): List<ValueChange<Operation>> {
     var currentOp = included
     if(currentOp.value().unit != valueUnit && currentOp.value().amount.signum() < 0){
       // It's an expense in other currency, let's invert the operation to consider the other currency as asset
@@ -43,7 +43,7 @@ class PortfolioValuation(val valueUnit: String) {
     return assetChanges
   }
 
-  private fun calculateValueOperations(included: Operation, assetChanges: List<ValueChange>): List<Operation> {
+  private fun calculateValueOperations(included: Operation, assetChanges: List<ValueChange<Operation>>): List<Operation> {
     val includedValueUnit = included.value().unit
     if(includedValueUnit == valueUnit || assetChanges.isEmpty()){
       // Operation uses same currency as this portfolio, use the value as is
@@ -62,7 +62,7 @@ class PortfolioValuation(val valueUnit: String) {
     }
   }
 
-  private fun considerProfitAndLossesDueTo(changes: List<ValueChange>) {
+  private fun considerProfitAndLossesDueTo(changes: List<ValueChange<Operation>>) {
     changes
       .filter { change -> !change.isZero() } // Exclude changes that are not profit or losses
       .forEach(profitAndLosses::add)

@@ -1,23 +1,22 @@
 package info.kfgodel.contable.concepts
 
 import info.kfgodel.contable.of
-import info.kfgodel.contable.valued.ValuedAsset
 import java.math.BigDecimal
 
 /**
  * This type reprents an exchange of two assets which implies a exchange rate
  * Date: 26/6/22 - 22:00
  */
-data class Exchange(val asset: Magnitude, val price: Magnitude) : ValuedAsset {
+data class Exchange(val asset: Magnitude, val price: Magnitude) {
     override fun toString(): String {
         return "$asset @ $price"
     }
 
-    override fun asset(): Magnitude {
+    fun asset(): Magnitude {
         return asset
     }
 
-    override fun value(): Magnitude {
+    fun value(): Magnitude {
         return price
     }
 
