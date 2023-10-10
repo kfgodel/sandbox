@@ -2,6 +2,7 @@ package info.kfgodel.contable.printer
 
 import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
+import info.kfgodel.contable.accountant.PortfolioOperation
 import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.concepts.OperationType
 import info.kfgodel.contable.toISODate
@@ -50,13 +51,13 @@ class CsvPrinter(private val report: AccountantReport) {
     }
   }
 
-  private fun asCsvPart(change: ValueChange<Operation>): String {
+  private fun asCsvPart(change: ValueChange<PortfolioOperation>): String {
     return asCsvRow(
       listOf(
         // Wallet
         "",
         // Operado en
-        change.replacement().moment.toISODate(),
+        change.replacement().originalOperation.moment.toISODate(),
         // Tipo
         "\\",
         // Asset
@@ -78,7 +79,7 @@ class CsvPrinter(private val report: AccountantReport) {
         // Dif Precio
         change.value().amount.toString(),
         // Fecha original
-        change.replaced().moment.toISODate(),
+        change.replaced().originalOperation.moment.toISODate(),
         // Valuacion
         ""
       )

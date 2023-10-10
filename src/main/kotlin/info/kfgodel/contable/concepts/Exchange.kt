@@ -1,26 +1,38 @@
 package info.kfgodel.contable.concepts
 
 import info.kfgodel.contable.of
+import info.kfgodel.contable.valued.ValuedAsset
 import java.math.BigDecimal
 
 /**
  * This type reprents an exchange of two assets which implies a exchange rate
  * Date: 26/6/22 - 22:00
  */
-data class Exchange(val asset: Magnitude, val price: Magnitude) {
-    override fun toString(): String {
-        return "$asset @ $price"
-    }
+data class Exchange(val asset: Magnitude, val price: Magnitude) : ValuedAsset<Exchange> {
+  override fun toString(): String {
+    return "$asset @ $price"
+  }
 
-    fun asset(): Magnitude {
-        return asset
-    }
+  override fun asset(): Magnitude {
+    return asset
+  }
 
-    fun value(): Magnitude {
-        return price
-    }
+  override fun value(): Magnitude {
+    return price
+  }
 
-  fun proportionalto(newAssetAmount: BigDecimal): Exchange {
+  override fun splitBy(splitAmount: BigDecimal): Pair<Exchange, Exchange> {
+    var limitedAmount = splitAmount.min(asset().amount.abs()) // We cannot split what we don't have
+    if (asset().amount.signum() < 0) {
+      limitedAmount = limitedAmount.negate()
+    }
+    val splitExchange = proportionalTo(limitedAmount)
+    val remainingAmount = asset().amount.minus(limitedAmount)
+    val remainingExchange = proportionalTo(remainingAmount)
+    return Pair(splitExchange, remainingExchange)
+  }
+
+  fun proportionalTo(newAssetAmount: BigDecimal): Exchange {
     val newValueAmount = value().amount.multiply(newAssetAmount)
       .divide(asset().amount, Magnitude.MATH_CTX)
     return newAssetAmount.of(asset().unit).at(newValueAmount.of(value().unit))

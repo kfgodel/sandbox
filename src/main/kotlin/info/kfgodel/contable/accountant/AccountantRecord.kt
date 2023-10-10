@@ -9,5 +9,5 @@ import info.kfgodel.contable.valued.ValueChange
  * value change on
  * Date: 16/8/23 - 20:06
  */
-class AccountantRecord(val operation: Operation, val changes: List<ValueChange<Operation>>, val valuation: Magnitude) {
+class AccountantRecord(val operation: Operation, val changes: List<ValueChange<PortfolioOperation>>, val valuation: Magnitude) {
 }

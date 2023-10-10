@@ -2,6 +2,7 @@ package info.kfgodel.contable.printer
 
 import info.kfgodel.contable.accountant.AccountantRecord
 import info.kfgodel.contable.accountant.AccountantReport
+import info.kfgodel.contable.accountant.PortfolioOperation
 import info.kfgodel.contable.concepts.Operation
 import info.kfgodel.contable.valued.ValueChange
 import info.kfgodel.contable.valued.changeSymbolFor
@@ -30,10 +31,10 @@ class ScreenPrinter(private val report: AccountantReport) {
 
   }
 
-  private fun printlnAsChange(change: ValueChange<Operation>) {
+  private fun printlnAsChange(change: ValueChange<PortfolioOperation>) {
     val replaced = change.replaced()
     val replacement = change.replacement()
-    println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset()} @ ${replacement.value()} desde ${replaced.value()} en ${replaced.moment}")
+    println("\t\\ ${changeSymbolFor(change.value().amount)} ${change.value().amount}: ${replaced.asset()} @ ${replacement.value()} desde ${replaced.value()} en ${replaced.originalOperation.moment}")
   }
 
   private fun printAsOperation(record: AccountantRecord) {

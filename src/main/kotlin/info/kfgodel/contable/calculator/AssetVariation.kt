@@ -1,36 +1,34 @@
 package info.kfgodel.contable.calculator
 
-import info.kfgodel.contable.valued.ValueChange
-import info.kfgodel.contable.valued.ValuedAsset
 import java.util.LinkedList
 
 /**
  * This type represents the result of calculating the impact of one operation over others
  */
-class AssetVariation<S: ValuedAsset<S>>(val startingOperations: List<S>, val modifyingOperation: S) {
+class AssetVariation<A: AssetSource<A>>(val startingOperations: List<A>, val modifyingOperation: A) {
   private val remainingOperations = LinkedList(startingOperations)
-  private val changes = mutableListOf<ValueChange<S>>()
-  private val addedOperations = mutableListOf<S>()
-  private val reducedOperations = mutableListOf<S>()
+  private val changes = mutableListOf<Pair<A,A>>()
+  private val addedOperations = mutableListOf<A>()
+  private val reducedOperations = mutableListOf<A>()
 
-  fun addedOperations(): List<S> {
+  fun addedOperations(): List<A> {
     return addedOperations;
   }
-  fun reducedOperations(): List<S> {
+  fun reducedOperations(): List<A> {
     return reducedOperations;
   }
 
   /**
    * State of original operations after the impact. It may result in the loss, gain or any combination of those
    */
-  fun remainingOperations(): List<S> {
+  fun remainingOperations(): List<A> {
     return remainingOperations
   }
 
   /**
    * List of changes in the value of original operations after the impact of the new
    */
-  fun valueChanges(): List<ValueChange<S>> {
+  fun changes(): List<Pair<A,A>> {
     return changes
   }
 
@@ -38,27 +36,27 @@ class AssetVariation<S: ValuedAsset<S>>(val startingOperations: List<S>, val mod
     return this.remainingOperations().isNotEmpty()
   }
 
-  fun removeOldest(): S {
+  fun removeOldest(): A {
     return remainingOperations.removeFirst();
   }
 
-  fun keepAsOldest(oldestOperation: S) {
+  fun keepAsOldest(oldestOperation: A) {
     remainingOperations.addFirst(oldestOperation)
   }
 
-  fun keepAsNewest(newest: S) {
+  fun keepAsNewest(newest: A) {
     remainingOperations.addLast(newest)
   }
 
-  fun recordChange(consumedOldest: S, consumedCurrent: S) {
-    changes.add(ValueChange(consumedOldest, consumedCurrent))
+  fun recordChange(consumedOldest: A, consumedCurrent: A) {
+    changes.add(Pair(consumedOldest, consumedCurrent))
   }
 
-  fun addOperation(addedOperation: S) {
+  fun addOperation(addedOperation: A) {
     addedOperations.add(addedOperation)
   }
 
-  fun reduceOperation(reducedOperation: S) {
+  fun reduceOperation(reducedOperation: A) {
     reducedOperations.add(reducedOperation)
   }
 

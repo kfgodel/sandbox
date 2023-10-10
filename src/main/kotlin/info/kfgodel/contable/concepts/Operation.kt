@@ -54,10 +54,10 @@ data class Operation(
     if (exchange.asset().amount.signum() < 0) {
       limitedAmount = limitedAmount.negate()
     }
-    val splitOperation = Operation(type, exchange.proportionalto(limitedAmount), moment, mainAccount, externalAccount)
+    val splitOperation = Operation(type, exchange.proportionalTo(limitedAmount), moment, mainAccount, externalAccount)
     val remainingAmount = exchange.asset().amount.minus(limitedAmount)
     val remainingOperation =
-      Operation(type, exchange.proportionalto(remainingAmount), moment, mainAccount, externalAccount)
+      Operation(type, exchange.proportionalTo(remainingAmount), moment, mainAccount, externalAccount)
     return Pair(splitOperation, remainingOperation)
   }
 

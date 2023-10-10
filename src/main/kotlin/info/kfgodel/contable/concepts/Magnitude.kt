@@ -35,6 +35,17 @@ data class Magnitude(val amount: BigDecimal, val unit:String) {
     return this.at(this)
   }
 
+  fun isNegative(): Boolean {
+    return this.amount.signum() < 0
+  }
+
+  fun asPositive(): Magnitude {
+    if(this.amount.signum() < 0){
+      return negative()
+    }
+    return this
+  }
+
   companion object {
         val ROUNDING = RoundingMode.HALF_EVEN
         val MATH_CTX = MathContext(16, ROUNDING)
