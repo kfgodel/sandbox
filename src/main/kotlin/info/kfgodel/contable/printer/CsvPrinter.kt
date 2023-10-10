@@ -44,11 +44,50 @@ class CsvPrinter(private val report: AccountantReport) {
     val records = report.records()
     for (record in records) {
       println(asCsvOperation(record))
+      if(record.operation.type == OperationType.WITHDRAW){
+        println(asWitdraw(record))
+      }
       val operationChanges = record.changes
       for (change in operationChanges) {
         println(asCsvPart(change))
       }
     }
+  }
+
+  private fun asWitdraw(record: AccountantRecord): String {
+    return asCsvRow(
+      listOf(
+        // Wallet
+        "",
+        // Operado en
+        "",
+        // Tipo
+        "\\",
+        // Asset
+        "",
+        // Cantidad
+        "",
+        // Moneda
+        "",
+        // Importe
+        "",
+        // Cuenta externa
+        "",
+        // Parte
+        record.operation.exchange.asset().amount.toString(),
+        // Precio original
+        "",
+        // Nuevo Precio
+        record.valuationDifference().amount.toString(),
+        // Dif Precio
+        "",
+        // Fecha original
+        "",
+        // Valuacion
+        ""
+      )
+    )
+
   }
 
   private fun asCsvPart(change: ValueChange<PortfolioOperation>): String {
@@ -129,7 +168,7 @@ class CsvPrinter(private val report: AccountantReport) {
         // Fecha original
         "",
         // Valuacion
-        record.valuation.amount.toString(),
+        record.endingValuation.amount.toString(),
       )
     )
   }
