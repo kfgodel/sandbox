@@ -41,15 +41,9 @@ class AssetBalance(val assetUnit: String, val valueUnit: String) {
     val result = ChangeCalculator(operations)
       .calculateFor(newOperation)
     this.operations = result.remainingOperations()
-    val valueChanges = result.changes()
+    return result.changes()
       .map { change -> ValueChange(change.first, change.second) }
       .filter { change -> !change.isZero() }
-
-    if (valueChanges.isEmpty() || valueChanges.map { change -> change.value() }.reduce(Magnitude::sum).isZero()) {
-      // All the value changes cancel each other. It's not really a value change
-      return emptyList()
-    }
-    return valueChanges
   }
 
   private fun validateSameAsset(newOperation: PortfolioOperation) {

@@ -15,11 +15,12 @@ import info.kfgodel.contable.valued.ValueChange
  */
 class CsvPrinter(private val report: AccountantReport) {
   fun print() {
-    println("* Año: ${report.year}")
+    // This needs to be pre-calculated. FIX-ME
     val startingValuation = report.valuationAtStart()
-    println("Saldos iniciales:\t" + asCsvBalances(startingValuation.balances()))
     val endingValuation = report.valuationAtEnd()
-    println("Saldos finales:\t" + asCsvBalances(endingValuation.balances()))
+
+
+    println("* Año: ${report.year}")
     println(
       asCsvRow(
         listOf(
@@ -44,13 +45,30 @@ class CsvPrinter(private val report: AccountantReport) {
     val records = report.records()
     for (record in records) {
       println(asCsvOperation(record))
-      if(record.operation.type == OperationType.WITHDRAW){
+      if (record.operation.type == OperationType.WITHDRAW) {
         println(asWitdraw(record))
       }
       val operationChanges = record.changes
       for (change in operationChanges) {
         println(asCsvPart(change))
       }
+    }
+
+    println("Saldos iniciales:")
+    printBalances(startingValuation.balances())
+    println("Saldos finales:")
+    printBalances(endingValuation.balances())
+  }
+
+  private fun printBalances(balances: List<AssetBalance>) {
+    balances.forEach { balance ->
+      println(asCsvRow(listOf(
+        "-",
+        balance.asset().unit,
+        balance.asset().amount.toString(),
+        balance.value().unit,
+        balance.value().amount.toString()
+      )))
     }
   }
 
@@ -184,8 +202,7 @@ class CsvPrinter(private val report: AccountantReport) {
   private fun asCsvBalances(balances: List<AssetBalance>): String {
     return asCsvRow(balances.flatMap { balance ->
       listOf(
-        balance.asset().unit,
-        balance.asset().amount.toString()
+        balance.toString()
       )
     })
   }
