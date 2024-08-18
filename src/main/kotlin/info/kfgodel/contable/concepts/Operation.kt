@@ -15,7 +15,8 @@ data class Operation(
   val exchange: Exchange,
   val moment: LocalDateTime,
   val mainAccount: String = UNDEFINED_ACCOUNT,
-  val externalAccount: String = UNDEFINED_ACCOUNT
+  val externalAccount: String = UNDEFINED_ACCOUNT,
+  val id: String = UNDEFINED_ID,
 ) : ValuedAsset<Operation> {
   fun wasDoneBy(date: LocalDateTime) = moment.isEqual(date) || moment.isBefore(date)
 
@@ -38,7 +39,7 @@ data class Operation(
   override fun toString(): String {
     val usingAccount = mainAccount.let { acc -> if (acc == UNDEFINED_ACCOUNT) "" else " in $acc" }
     val andAccount = externalAccount.let { acc -> if (acc == UNDEFINED_ACCOUNT) "" else " using $acc" }
-    return "$type $exchange on $moment$usingAccount$andAccount"
+    return "#$id: $type $exchange on $moment$usingAccount$andAccount"
   }
 
   fun using(accountName: String): Operation {
@@ -62,11 +63,16 @@ data class Operation(
   }
 
   fun counterpart(): Operation {
-    return Operation(type, exchange.inverse(), moment, mainAccount, externalAccount)
+    return Operation(type, exchange.inverse(), moment, mainAccount, externalAccount, id)
+  }
+
+  fun andId(newId: String): Operation {
+    return Operation(type, exchange, moment, mainAccount, externalAccount, newId)
   }
 
   companion object {
     const val UNDEFINED_ACCOUNT = "UNDEFINED"
+    const val UNDEFINED_ID = "UNDEFINED"
   }
 
 }

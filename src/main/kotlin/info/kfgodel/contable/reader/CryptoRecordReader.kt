@@ -27,7 +27,7 @@ import java.util.Locale
  * Date: 27/8/23 - 14:22
  */
 class CryptoRecordReader: OperationsReader {
-  private val LINE_REGEX = """(\w+)\t(\d{4}-\d{2}-\d{2})\t(COMPRA|VENTA|DEPOSITO|RETIRO|TRANSFER|COMISION|INTERESES)\t(\w+)?\t(-?\d[\d.,]*)?\t(\w+)\t(-?\d[\d.,]*)\t?(.+)?""".toRegex()
+  private val LINE_REGEX = """(\d+)\t(\w+)\t(\d{4}-\d{2}-\d{2})\t(COMPRA|VENTA|DEPOSITO|RETIRO|TRANSFER|COMISION|INTERESES)\t(\w+)?\t(-?\d[\d.,]*)?\t(\w+)\t(-?\d[\d.,]*)\t?(.+)?""".toRegex()
   private val DECIMAL_FORMATTER = (NumberFormat.getInstance(Locale.US) as DecimalFormat)
     .also { formatter -> formatter.setParseBigDecimal(true) }
   private val DATE_FORMATTER: DateFormat = SimpleDateFormat("yyyy-MM-dd")
@@ -49,26 +49,29 @@ class CryptoRecordReader: OperationsReader {
       return
     }
     val matchResult = LINE_REGEX.matchAt(operationLine, 0)
-    if (matchResult == null || matchResult.groups.size != 9) {
-      throw IllegalArgumentException("Report line has unexpected format. Expected[Buenbit\t2020-05-13\tTRANSFER\tDAI\t941.06\tDAI\t941.06\tSatoshi] got:[${operationLine}]")
+    if (matchResult == null) {
+      throw IllegalArgumentException("Line has unexpected format. Expected[100\tBuenbit\t2020-05-13\tTRANSFER\tDAI\t941.06\tDAI\t941.06\tSatoshi] got:[${operationLine}]")
+    } else if(matchResult.groups.size != 10) {
+      throw IllegalArgumentException("Line can't be parsed into the parts we expected. Expected[100\tBuenbit\t2020-05-13\tTRANSFER\tDAI\t941.06\tDAI\t941.06\tSatoshi] got:[${operationLine}]")
     }
     val readOperation = parseOperation(matchResult)
     operations.add(readOperation)
   }
 
   private fun parseOperation(matchResult: MatchResult): Operation {
-    val mainAccount = matchResult.groupValues[1]
-    val date = matchResult.groupValues[2]
-    val type = matchResult.groupValues[3]
-    val asset = matchResult.groupValues[4]
-    val quantity = matchResult.groupValues[5]
-    val currency = matchResult.groupValues[6]
-    val amount = matchResult.groupValues[7]
-    val externalAccount = matchResult.groupValues[8].ifBlank { Operation.UNDEFINED_ACCOUNT}
+    val opId = matchResult.groupValues[1]
+    val mainAccount = matchResult.groupValues[2]
+    val date = matchResult.groupValues[3]
+    val type = matchResult.groupValues[4]
+    val asset = matchResult.groupValues[5]
+    val quantity = matchResult.groupValues[6]
+    val currency = matchResult.groupValues[7]
+    val amount = matchResult.groupValues[8]
+    val externalAccount = matchResult.groupValues[9].ifBlank { Operation.UNDEFINED_ACCOUNT}
     val operationType = parseOperationType(type)
     val operationExchange = parseExchange(quantity, asset, amount, currency)
     val operationMoment = parseMoment(date)
-    return Operation(operationType, operationExchange, operationMoment, mainAccount, externalAccount)
+    return Operation(operationType, operationExchange, operationMoment, mainAccount, externalAccount, opId)
   }
 
   private fun parseMoment(date: String): LocalDateTime {
