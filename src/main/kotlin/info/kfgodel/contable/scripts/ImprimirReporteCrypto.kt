@@ -10,7 +10,7 @@ import info.kfgodel.contable.reader.CryptoRecordReader
  */
 fun main() {
   val ledger = Ledger().fromFile("crypto.txt", CryptoRecordReader())
-  for (year in 2019..2023) {
+  for (year in 2019..2024) {
     val report = ledger.reportFor(year, ARS)
     CsvPrinter(report).print()
   }
